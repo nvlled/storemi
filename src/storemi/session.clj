@@ -1,11 +1,22 @@
 (ns storemi.session
   (:require 
     [clj-redis-session.core :refer [redis-store]]
+    [taoensso.carmine :as redis]
+    [ring.middleware.session.memory :refer [memory-store]]
     [storemi.models.user :as user]))
 
-(defn make-redis-store []
-  (redis-store {:pool {}
-                :spec {:host "127.0.0.1" :port 6379}}))
+(def redis-spec
+  {:pool {}
+   :spec {:host "127.0.0.1" :port 6379}})
+
+(defn redis-ping []
+  (redis/wcar redis-spec (redis/ping)))
+
+(defn make-store []
+  (try 
+    (redis-ping)
+    (redis-store redis-spec)
+    (catch Exception e (memory-store))))
 
 (defn create [response username]
   (-> response

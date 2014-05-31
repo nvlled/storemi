@@ -7,7 +7,7 @@
     [hiccup.middleware :refer [wrap-base-url]]
     [compojure.handler :as handler]
     [compojure.route :as route]
-    [storemi.session :refer [make-redis-store]]
+    [storemi.session :refer [make-store]]
     [storemi.models.db :refer [tables-initialized?]]
     [storemi.models.user :refer [create-user-table]]
     [storemi.models.story :refer [create-story-table]]
@@ -71,7 +71,7 @@
 (def app 
   (-> (collect-routes ns-routes app-routes)
       ;(#'policy-handler)
-      (handler/site {:session {:store (make-redis-store)}})
+      (handler/site {:session {:store (make-store)}})
       ignore-trailing-slash
       (wrap-base-url)))
 
