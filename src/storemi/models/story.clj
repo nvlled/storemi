@@ -1,5 +1,6 @@
 (ns storemi.models.story
   (:require 
+    [hiccup.util :refer [escape-html]]
     [clj-http.client :as client]
     [clojure.java.jdbc :as sql]
     [storemi.models.db :as db]
@@ -81,8 +82,8 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
           {:username  username
            :data      (db/json-string data)
            :script    script
-           :title     title
-           :synopsis  synopsis})]
+           :title     (escape-html title)
+           :synopsis  (escape-html synopsis)})]
     (first response)))
 
 (defn parse-script [script]
