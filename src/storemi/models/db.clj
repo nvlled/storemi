@@ -13,7 +13,7 @@
     (catch java.io.FileNotFoundException e )))
 
 (def db
-  (or (System/getenv "PORT")
+  (or (System/getenv "DATABASE_URL")
       (merge
         {:subprotocol "postgresql"
          :subname "//127.0.0.1:5432/demitalesdb"}
