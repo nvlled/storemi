@@ -143,7 +143,10 @@
     [:p [:input {:name "hideChapterIndex" :type :checkbox} 
          "Hide chapter index "]]
     [:p [:input {:name "hideSceneIndex" :type :checkbox} 
-         "Hide scene index "]]]])
+         "Hide scene index "]]
+    [:p [:input {:name "hideWarnings" :type :checkbox} 
+         "Hide warnings"]]
+    ]])
 
 (defn edit-button-panel [story]
   (if (:published story)

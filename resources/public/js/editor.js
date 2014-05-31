@@ -105,6 +105,7 @@ function readingMode(config) {
 		hideSceneIndex: true,
 		hideSynopsis: false,
 		hideChapterIndex: chIndex,
+		hideWarnings: true,
 	});
 }
 

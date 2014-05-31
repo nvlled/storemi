@@ -95,13 +95,13 @@ var Story = React.createClass({displayName: 'Story',
 					React.DOM.em(null, story.synopsis)
 				),
 				React.DOM.hr(null ),
+				renderIf(!view.config.hideWarnings)(
+						React.DOM.div(null, warnings)
+				),
 				renderIf(!view.config.hideChapterIndex)(
-					React.DOM.div(null, 
-						React.DOM.div(null, warnings),
-						ChapterIndex(
-							{data:story.chapters,
-							view:this.state.view} )
-					)
+					ChapterIndex(
+						{data:story.chapters,
+						view:this.state.view} )
 				),
 				chapterComponent,
 				React.DOM.div( {className:"spacing"})
@@ -260,14 +260,14 @@ var Chapter = React.createClass({displayName: 'Chapter',
         return (
 			React.DOM.div( {id:Chapter.selector(chapter)}, 
                 React.DOM.h2(null, chapter.title),
+				renderIf(!view.config.hideWarnings)(
+					React.DOM.div(null, warnings)
+				),
 				renderIf(!view.config.hideSceneIndex)(
-					React.DOM.div(null, 
-						React.DOM.div(null, warnings),
-						SceneIndex( 
-							{chapter:chapter,
-							data:chapter.scenes,
-							view:view} ) 
-					)
+					SceneIndex( 
+						{chapter:chapter,
+						data:chapter.scenes,
+						view:view} ) 
 					),
 				React.DOM.br(null ),
 				sceneComponent
@@ -590,6 +590,7 @@ function ViewState(component, config, mode) {
 		hideChapterIndex: false,
 		hideSynopsis: false,
 	}, config);
+	this.config = this.configMode(this.config);
 }
 
 ViewState.prototype = {
