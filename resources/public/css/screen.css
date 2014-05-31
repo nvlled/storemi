@@ -1,0 +1,180 @@
+body {
+    height: 100%;
+    html: 100%;
+    font: 16px Helvetica, Arial;
+    background-color: #333;
+    color: #ddd;
+}
+
+#wrapper {
+    width: 700px;
+    margin: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+.chapter-title {
+  display: block;
+}
+
+#story-synopsis {
+  font-size: 10px;
+  font-style: italic;
+}
+#chapter-list {
+
+}
+
+.chapter-title {
+  display: block;
+}
+
+#scripts {
+    display: none;
+}
+
+h1 a, h2 a {
+    color: #eee;
+}
+
+a.scene-link, a.scene-link:visited {
+    color: #8f8;
+}
+
+a.disabled:hover {
+    cursor: text;
+}
+
+a, a:visited {
+    color: #0af;
+}
+
+a.disabled, a.disabled:visited {
+    color: #ddd;
+}
+
+img {
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+h1 {
+    font-size: 22px;
+} 
+
+h2 {
+    font-size: 20px;
+} 
+
+input.flash {
+    background-color: #f00;
+}
+
+.game-var {
+    color: #d55;
+}
+
+.game-input a {
+    padding-left: 5px;
+}
+
+.scene-title {
+	font-size: 16px;
+    text-decoration: underline;
+}
+
+.scene-title:hover a {
+    text-decoration: underline;
+    visibility: visible;
+}
+
+.scene-title a {
+    text-decoration: none;
+    visibility: hidden;
+    padding-left: 5px;
+}
+
+
+.footer {
+    margin-top: 100px;
+}
+
+a.scene-link.active,
+a.active {
+    color: white;
+}
+
+.nav a {
+    padding-right: 10px;
+}
+
+.notification {
+    color: green;
+}
+
+.error {
+    color: red;
+}
+
+.logo, .desc {
+    display: inline;
+}
+
+.header-split {
+    height: 30px;
+    display: block;
+}
+
+.nav {
+}
+
+.story-creator {
+    padding: 10px;
+    border: 1px solid #555;
+}
+
+
+.notification {
+    text-align: center;
+    color: #afa;;
+}
+
+div.spacing {
+	min-height: 100px;
+}
+
+.story-title a {
+	color: #eee;
+	text-decoration: underline;
+}
+
+.story-title a.active {
+	color: #eee;
+	text-decoration: none;
+}
+
+a.story-settings {
+	margin-right: 5px;
+	margin-top: 10px;
+	font-size: 9px;
+	text-decoration: none;
+	float: right;
+}
+
+form.story-settings input[name=close]{
+	float: right;
+}
+
+
+.thumbnail img {
+}
+
+.thumbnail .label {
+	margin-right: 13px;;
+}
+
+
+

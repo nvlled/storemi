@@ -1,0 +1,4 @@
+
+- Show (error) messages when scene is not found
+- Show (error) messages when a label has been duplicated
+- Autogenerate script labels

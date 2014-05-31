@@ -1,0 +1,110 @@
+body {
+  height: 100%;
+  html: 100%;
+  font: 16px Helvetica, Arial;
+  background-color: #333;
+  color: #ddd;
+}
+
+#wrapper {
+    width: 60%;
+}
+
+#create {
+  padding-bottom: 100px;
+}
+
+#create form {
+  height: 80%;
+}
+
+#create textarea {
+  resize: vertical;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  height: 80%;
+}
+
+#create {
+  float: left;
+  width: 48%;
+  background-color: #666;
+  color: #fff;
+  padding: 1%;
+  height: 90vh;
+  overflow-y: auto;
+}
+
+#view {
+  float: right;
+  width: 48%;
+  background-color: #333;
+  color: #ccc;
+  padding: 1%;
+  height: 90vh;
+  overflow-y: auto;
+}
+
+#story-synopsis {
+  font-size: 10px;
+  font-style: italic;
+}
+
+#chapter-list {
+
+}
+
+#scripts {
+    display: none;
+}
+
+
+#wrapper {
+    width: 90%;
+    margin: auto;
+}
+
+.thumbnail {
+	width: 20%;
+}
+
+.template {
+	display: none;
+}
+
+#images .add-image {
+	float: right;
+}
+
+.upload-all-button {
+	float: right;
+}
+
+.image-uploader input {
+	margin-right: 10px;
+}
+
+table {
+	width: 100%;
+}
+
+td {
+	border: 1px solid #555;
+	padding: 5px;
+}
+
+td img {
+}
+
+
+.editing-options {
+}
+
+
+
+
+
+
+
