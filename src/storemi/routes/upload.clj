@@ -8,8 +8,10 @@
     [storemi.models.db :as db]
     [storemi.session :as session]
     [storemi.settings :refer [image-directory]]
+    [storemi.lib.rule :refer [layer coerce]]
     [storemi.routes.policies :refer
-     [enforce-log-in]]
+     [enforce-log-in
+      enforce-upload]]
     [storemi.lib.rule :refer [coerce]]
     ))
 
@@ -67,9 +69,8 @@
   (wrap-multipart-params
     (POST (url/upload-image) [image-data :as request]
           ;(Thread/sleep 5000)
-          (coerce enforce-log-in store-image)
-          ;(store-image request)
-          )))
+          (coerce (layer enforce-upload enforce-log-in)
+                  store-image))))
 
 
 

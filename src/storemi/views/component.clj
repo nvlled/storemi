@@ -1,6 +1,7 @@
 (ns storemi.views.component
   (:require 
     [hiccup.page :refer [html5 include-css]]
+    [storemi.settings :as settings]
     [storemi.urlfor :as urlfor]))
 
 (defn hidden-field [name val]
@@ -175,6 +176,9 @@
 (defn story-editor [story]
   [:div.editor
    [:div {:id "create"}
+    [:input {:id "disable-upload" :value 
+             :type :hidden
+             (when settings/disable-upload "1")}]
     [:p "script"]
     [:form {:action (urlfor/story-edit (:username story) (:id story))
             :method "POST"}
@@ -184,4 +188,5 @@
      ;(story-images story)
      (editing-options)]]
    [:div {:id "view"}]])
+
 

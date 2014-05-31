@@ -33,12 +33,19 @@ window.addEventListener("load", function() {
 		listUserImages: _.partial(listUserImages, username),
 		scriptEditor: scriptEditor,
 		data: initialData,
-		uploader: new Uploader(),
+		uploader: getUploader(),
 	});
 	React.renderComponent(imagePanel, sel(document, "#images"));
 	scriptEditor.bindComponent(imagePanel);
 	setupEditingOptions(storyComponent);
 });
+
+function getUploader() {
+	disableUpload = sel(document, "#disable-upload");
+	if (disableUpload && !disableUpload.value) {
+		return new Uploader();
+	}
+}
 
 function ScriptEditor(textarea) {
 	this.textarea = textarea;

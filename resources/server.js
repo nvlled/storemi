@@ -25,7 +25,7 @@ var server = http.createServer(function(request, response) {
     if (handler)
         handler(request, response);
     else
-        response.end("Not found you suck");
+        response.end("Not found");
 });
 
 server.listen(3030)

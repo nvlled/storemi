@@ -201,6 +201,10 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 	},
 
 	render: function() {
+
+		if (!this.props.uploader)
+			return React.DOM.em(null, "(uploading has been disabled)")
+
 		var images = this.state.images;
 		var rows = _.map(images, function(path) {
 			var onClick = this.selectImage.bind(this, path);
@@ -232,9 +236,11 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 					onClick:this.addImage,
 					type:"button", 
 					value:"Add image"} ),
+				renderIf(this.props.upload)(
 				ImageUploader( 
 					{insertNewImage:this.insertNewImage,
 					uploader:this.props.uploader} )
+				)
 			)
 		);
 	}

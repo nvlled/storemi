@@ -86,7 +86,6 @@ function updateFigures(figures, script) {
 			lines[i] = makeLink(m.key, val);
 			delete figures[m.key];
 		} else if (val === null){
-			//lines[i] = makeLink(m.key, "you suck");
 			lines.splice(i, 1); // delete
 			i--;
 			delete figures[m.key];

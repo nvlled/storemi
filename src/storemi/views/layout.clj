@@ -19,7 +19,7 @@
    [:p "params: " (-> request :params str)]
    [:hr]])
 
-(defn common [req & {:keys [title body styles scripts]}]
+(defn common [req & {:keys [title body styles scripts status]}]
   (html5
     [:head
      [:title (site-title title)]

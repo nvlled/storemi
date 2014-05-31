@@ -16,5 +16,4 @@
 
 (def credentials-file "credentials.clj")
 
-
-
+(def disable-upload (boolean (System/getenv "DISABLE_UPLOAD")))

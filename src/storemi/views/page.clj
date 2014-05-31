@@ -1,5 +1,6 @@
 (ns storemi.views.page
   (:require
+    [ring.util.response :as ring]
     [storemi.session :as session]  
     [storemi.models.story :as st]
     [storemi.views.component :as cmpt]
@@ -8,13 +9,15 @@
     [storemi.lib.tourl :refer [retour detour-param-key]]
     ))
 
-(defn error [request]
-  (layout/common
-    request
-    :title "You suck"
-    :body [:h2 "Error: "
-           (or (get-in request [:errors :msg])
-               "You borke the internets.")]))
+(defn error [request & [status]]
+  (let [body (layout/common
+               request
+               :title "Uh-oh"
+               :body [:h2 "Error: "
+                      (or (get-in request [:errors :msg])
+                          "You borke the internets.")])] 
+    {:body body
+     :status (or status 404)}))
 
 (defn admin [request]
   (layout/common

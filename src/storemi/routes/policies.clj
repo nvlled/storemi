@@ -3,6 +3,7 @@
     [ring.util.response :refer [response redirect]]
     [storemi.lib.tourl :refer [retour detour]]
     [storemi.session :as session]
+    [storemi.settings :refer [disable-upload]]
     [storemi.views.page :as page]
     [storemi.urlfor :as url]  
     [storemi.models.user :as user]  
@@ -17,6 +18,10 @@
       compile-policies
       layer]]
     ))
+
+(defn upload-allowed [request]
+  (when disable-upload
+    {:msg "Uploads have been disabled"}))
 
 (defn user-is-admin [request]
   (when-not (session/sget request :admin)
@@ -57,6 +62,9 @@
     (fn [request]
       (-> (detour request "/login")
           (session/flash-put :notification "login required")))))
+
+(def enforce-upload
+  (create-enforcer upload-allowed page/error))
 
 (def enforce-user
   (create-enforcer user-exists page/error))
