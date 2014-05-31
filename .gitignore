@@ -7,7 +7,6 @@ dump
 /classes
 /checkouts
 /resources/jsx/module-cache
-/resources/public/js/react
 .lein-repl-history
 pom.xml
 **/*.swp
