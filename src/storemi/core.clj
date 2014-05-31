@@ -5,11 +5,11 @@
     [ring.server.standalone :refer [serve]]
     [storemi.handler :refer [app init]]))
 
-(defn -main [& port]
+(defn -main [& [port]]
   (serve 
     (-> app
         (wrap-file "resources")
         wrap-file-info)
-    {:port (or port 5050)
+    {:port (or (java.lang.Integer. port) 5050)
      :init init
      :join false}))
