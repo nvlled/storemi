@@ -437,18 +437,11 @@ Token.processors = {
                 return x.trim();
             });
 
+			self.text = split[0];
+			self.buttonVal = "ok";
             if (split.length >= 2) {
-                //self.defaultVal = split[1]
-                self.buttonVal = split.length >= 2 && split[1]
-                    ? split[1]
-                    : "ok";
-                //return split[0];
-                self.text = split[0];
-            } else {
-                return Error("Input needs a default value");
-            }
-        } else {
-            return Error("Input needs a destination scene");
+                self.buttonVal = split[1];
+            } 
         }
     },
 
@@ -457,11 +450,9 @@ Token.processors = {
         if (split.length == 2) {
             self.label = split[0];
             self.text = split[1];
-            //return split[1]
         } else {
             self.label = text;
             self.text = '';
-            //return '';
         }
     },
 }

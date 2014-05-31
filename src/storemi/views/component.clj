@@ -176,9 +176,9 @@
 (defn story-editor [story]
   [:div.editor
    [:div {:id "create"}
-    [:input {:id "disable-upload" :value 
+    [:input {:id "disable-upload" 
              :type :hidden
-             (when settings/disable-upload "1")}]
+             :value (when settings/disable-upload "1")}]
     [:p "script"]
     [:form {:action (urlfor/story-edit (:username story) (:id story))
             :method "POST"}

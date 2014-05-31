@@ -341,13 +341,14 @@ var Scene = React.createClass({displayName: 'Scene',
 		var active = subscene && 
 			toScene.label == subscene.label ;
 
+		var noVal = "XXXXX";
 		var value = view.bindings.get(key) ||
-			story.defaultBindings[key];
+			story.defaultBindings[key] || noVal;
 
 		var handler = function() {
 			var input = this.refs.input.getDOMNode();
 			var value = input.value = 
-				(input.value || story.defaultBindings[key]);
+				(input.value || story.defaultBindings[key]) || noVal;
 			view.bindings.set(key, value); 
 			input.blur();
 			this.subsceneHandler(toScene)();
