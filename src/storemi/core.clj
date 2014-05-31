@@ -8,10 +8,10 @@
 
 (defn -main [& [port]]
   (let [port (if port (Integer. port) 6060)]
+    (init)
     (ring/run-jetty 
       (-> app
           (wrap-file "resources")
           wrap-file-info)
       {:port port
-       :init init
        :join false})))
