@@ -21,6 +21,11 @@
 (defn none [pred col]
   (not (some pred col)))
 
+(defn valid-username [{params :params}]
+  (let [username (:username params) ]
+    (when (re-find #"[^a-zA-Z0-9]" username)
+      {:username "Must contain only alphanumeric characters."})))
+
 (defn password-matches [{params :params}]
   (let [p1 (:password  params)
         p2 (:password2 params)]
@@ -47,6 +52,7 @@
 (def registration-rule
   (one-by-one
     (has-params [:username :password])
+    valid-username
     (combine username-available
              (one-by-one 
                password-matches
