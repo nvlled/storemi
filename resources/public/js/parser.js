@@ -74,7 +74,6 @@ function updateFigures(figures, script) {
 		i = end;
 	}
 
-	console.log(i, end);
 	while(i < end) {
 		var j = nextLinkIndex(i, lines);
 		if (j < 0)
@@ -126,12 +125,20 @@ function parseChapters(lines, index) {
     lines.push(MARKER.SCRIPT_END);
     var grouped = groupWith(lines, index, nextChapterIndex);
 
-    return _.map(grouped, function(lines) {
+	var warnings = [];
+	var counter = new Counter();
+    var chapters =  _.map(grouped, function(lines) {
         var chapterData = parseMarkedData(lines[0]);
         var scenes = [];
         if (lines.length >= 2) {
             var scenes = parseScenes(lines, 0);
         }
+		var label = chapterData.label;
+
+		counter.inc(label);
+		if (counter.get(label) > 1)
+			warnings.push("Chapter label " + label + " is duplicated");
+
         return {
             label: chapterData.label,
             title: chapterData.text,
@@ -143,26 +150,51 @@ function parseChapters(lines, index) {
         // - where the root is the first scene
         // - give each path a unique label
     });
+	chapters.warnings = warnings;
+	return chapters;
+}
+
+function Counter() {
+	this.count = 0;
+	this.store = {};
+}
+Counter.prototype.get = function(key) {
+	return this.store[key] || 0;
+}
+Counter.prototype.inc = function(key) {
+	var store = this.store;
+	if (!store[key])
+		store[key] = 0;
+	store[key]++;
 }
 
 function parseScenes(lines, index) {
     lines.push(MARKER.SCRIPT_END);
     var grouped = groupWith(lines, index, nextSceneIndex);
 
-    return _.map(grouped, function(lines) {
+	var warnings = [];
+	var counter = new Counter();
+    var scenes = _.map(grouped, function(lines) {
 
         var sceneData = parseMarkedData(lines[0]);
         var text = getSceneText(lines, 1).trim();
         var mappings = getMappings(lines);
         var contents = parseSceneText(text);
+		var label = sceneData.label;
+
+		counter.inc(label);
+		if (counter.get(label) > 1)
+			warnings.push("Scene label " + label + " is duplicated");
 
         return {
-            label: sceneData.label,
+            label: label,
             title: sceneData.text,
             contents: contents,
             mappings: mappings,
         }
     });
+	scenes.warnings = warnings;
+	return scenes;
 }
 
 var tokenPattern = buildPattern();

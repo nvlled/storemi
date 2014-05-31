@@ -65,6 +65,11 @@ var Story = React.createClass({
 			return view.displaySettings(!view[name]);
 		}
 
+		var warnings = story.chapters.warnings;
+		warnings = _.map(warnings, function(msg) {
+			return <p className='error'><em>{msg}</em></p>;
+		});
+
 		return (
 			<div className='story'>
 				<h1 className='story-title'>
@@ -91,9 +96,12 @@ var Story = React.createClass({
 				)}
 				<hr />
 				{renderIf(!view.config.hideChapterIndex)(
-					<ChapterIndex 
-						data={story.chapters}
-						view={this.state.view} />
+					<div>
+						<div>{warnings}</div>
+						<ChapterIndex
+							data={story.chapters}
+							view={this.state.view} />
+					</div>
 				)}
 				{chapterComponent}
 				<div className="spacing"></div>
@@ -242,14 +250,25 @@ var Chapter = React.createClass({
 					data={scene}
 					view={view} />;
 
+		var warnings;
+		if (chapter.scenes) {
+			warnings = _.map(chapter.scenes.warnings, function(err) {
+				return <p><em className='error'>{err}</em></p>
+			});
+		}
+
         return (
 			<div id={Chapter.selector(chapter)}>
                 <h2>{chapter.title}</h2>
 				{renderIf(!view.config.hideSceneIndex)(
-					<SceneIndex 
-						chapter={chapter}
-						data={chapter.scenes}
-						view={view} /> )}
+					<div>
+						<div>{warnings}</div>
+						<SceneIndex 
+							chapter={chapter}
+							data={chapter.scenes}
+							view={view} /> 
+					</div>
+					)}
 				<br />
 				{sceneComponent}
             </div>

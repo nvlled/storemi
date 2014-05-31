@@ -65,6 +65,11 @@ var Story = React.createClass({displayName: 'Story',
 			return view.displaySettings(!view[name]);
 		}
 
+		var warnings = story.chapters.warnings;
+		warnings = _.map(warnings, function(msg) {
+			return React.DOM.p( {className:"error"}, React.DOM.em(null, msg));
+		});
+
 		return (
 			React.DOM.div( {className:"story"}, 
 				React.DOM.h1( {className:"story-title"}, 
@@ -91,9 +96,12 @@ var Story = React.createClass({displayName: 'Story',
 				),
 				React.DOM.hr(null ),
 				renderIf(!view.config.hideChapterIndex)(
-					ChapterIndex( 
-						{data:story.chapters,
-						view:this.state.view} )
+					React.DOM.div(null, 
+						React.DOM.div(null, warnings),
+						ChapterIndex(
+							{data:story.chapters,
+							view:this.state.view} )
+					)
 				),
 				chapterComponent,
 				React.DOM.div( {className:"spacing"})
@@ -242,14 +250,25 @@ var Chapter = React.createClass({displayName: 'Chapter',
 					data:scene,
 					view:view} );
 
+		var warnings;
+		if (chapter.scenes) {
+			warnings = _.map(chapter.scenes.warnings, function(err) {
+				return React.DOM.p(null, React.DOM.em( {className:"error"}, err))
+			});
+		}
+
         return (
 			React.DOM.div( {id:Chapter.selector(chapter)}, 
                 React.DOM.h2(null, chapter.title),
 				renderIf(!view.config.hideSceneIndex)(
-					SceneIndex( 
-						{chapter:chapter,
-						data:chapter.scenes,
-						view:view} ) ),
+					React.DOM.div(null, 
+						React.DOM.div(null, warnings),
+						SceneIndex( 
+							{chapter:chapter,
+							data:chapter.scenes,
+							view:view} ) 
+					)
+					),
 				React.DOM.br(null ),
 				sceneComponent
             )
