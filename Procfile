@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -cp target/storemi-standalone.jar clojure.main -m storemi.core $PORT
+web: java $JVM_OPTS -jar target/storemi-standalone.jar $PORT
