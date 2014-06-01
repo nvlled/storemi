@@ -24,6 +24,13 @@ window.addEventListener("load", function() {
         document.getElementById("view")
     );
 
+	var form = sel(document, "#create form");
+	form.addEventListener("submit", function(e) {
+		var data = parseScript(textarea.value);
+		sel(form, "input[name=storyTitle]").value = data.storyTitle;
+		sel(form, "input[name=synopsis]").value = data.synopsis;
+		//e.preventDefault();
+	});
 
 	var scriptEditor = new ScriptEditor(textarea);
 	scriptEditor.bindComponent(storyComponent);

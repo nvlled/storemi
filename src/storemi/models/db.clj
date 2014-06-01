@@ -1,5 +1,6 @@
 (ns storemi.models.db
   (:require 
+    [clojure.walk :refer [keywordize-keys]]
     [storemi.settings :as settings]
     [clojure.java.jdbc :as sql]
     [cheshire.core :as json]))
@@ -29,7 +30,8 @@
        (catch Exception _)))
 
 (defn json-parse [data]
-  (try (json/parse-string data)
+  (try (-> (json/parse-string data)
+           keywordize-keys)
        (catch Exception _)))
 
 (defn json-string-vals [m & ks]

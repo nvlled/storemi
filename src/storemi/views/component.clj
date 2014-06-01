@@ -158,24 +158,6 @@
       [:input {:name "draft" :type :submit :value "Save as draft"}]
       [:input {:name "published" :type :submit :value "Publish"}])))
 
-;(defn story-images [story]
-;  (let [radio 
-;        (fn [label]
-;          [:label 
-;           [:input {:type :radio :name "image-option"}]
-;           label])]
-;    [:div#images
-;     ;(added-images)
-;     [:h3 "Add images"]
-;     [:div.radios
-;      (radio "Local file")
-;      (radio "Your images")
-;      (radio "URL")]
-;     [:div.bodies
-;      (image-uploader)
-;      (image-browser [{:path "ajsdifj"} {:path "j1i23jo1ij"}])
-;      (url-browser)]]))
-
 (defn story-editor [story]
   [:div.editor
    [:div {:id "create"}
@@ -185,10 +167,12 @@
     [:p "script"]
     [:form {:action (urlfor/story-edit (:username story) (:id story))
             :method "POST"}
+     [:input {:name "storyTitle" :type :hidden }]
+     [:input {:name "synopsis" :type :hidden }]
+
      [:textarea {:name "script"} (:script story)]
      (edit-button-panel story)
      [:div#images]
-     ;(story-images story)
      (editing-options)]]
    [:div {:id "view"}]])
 

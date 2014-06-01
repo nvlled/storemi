@@ -51,7 +51,8 @@
         (sess/add-notification "Story created"))))
 
 (defn proceed-edition [{params :params :as req}]
-  (let [id (:story-id params)
+  (let [data (select-keys params [:storyTitle :synopsis])
+        id (:story-id params)
         script (clojure.string/replace 
                  (:script params) "\r" "")
         published 
@@ -60,7 +61,7 @@
         (if (empty? (select-keys params [:published :view]))
           (:uri req)
           (url/story (sess/username req) id))]
-    (st/update-story id published script)
+    (st/update-story id published data script)
     (-> (redirect path)
         (sess/add-notification "Story updated"))))
 
