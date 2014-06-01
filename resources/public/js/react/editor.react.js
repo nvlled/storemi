@@ -10,7 +10,12 @@ var ImagePanel = React.createClass({displayName: 'ImagePanel',
 	},
 
 	switchOption: function(index) {
-		this.setState({index: index});
+		if (index != this.state.index)
+			this.setState({index: index});
+		else  {
+			this.setState({index: -1});
+			this.refs.select.getDOMNode().reset();
+		}
 	},
 
 	update: function(data) {
@@ -47,7 +52,7 @@ var ImagePanel = React.createClass({displayName: 'ImagePanel',
 				LabeledImages( 
 					{images:images, 
 					removeImage:this.removeImage}),
-				React.DOM.div(null, 
+				React.DOM.form( {ref:"select"}, 
 					"Select method:",
 					options
 				),
@@ -194,10 +199,10 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 	addImage: function() {
 		var label = this.refs.label.getDOMNode();
 		var path = this.state.selectedImage;
-		console.log("->", label, path);
 		if (label.value.length > 0 && path.length > 0)
 			this.props.addImage(label.value, path);
 		label.value = "";
+		this.selectImage(null)
 	},
 
 	selectImage: function(img) {
@@ -209,6 +214,7 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 		if (!this.props.uploader)
 			return React.DOM.em(null, "(uploading has been disabled)")
 
+		var selectedImage = this.state.selectedImage;
 		var images = this.state.images;
 		var rows = _.map(images, function(path) {
 			var onClick = this.selectImage.bind(this, path);
@@ -216,10 +222,21 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 				React.DOM.tr(null, 
 					React.DOM.td(null, React.DOM.img( {className:"thumbnail", src:path} )),
 					React.DOM.td(null, React.DOM.a( {href:path} , path)),
+					renderIf(selectedImage == path)(
+					React.DOM.td(null, 
+						React.DOM.label(null, "Label: " ),
+						React.DOM.input( {ref:"label", size:4} ),
+						React.DOM.input( {ref:"path",
+							onClick:this.addImage,
+							type:"button", 
+							value:"Add image"} )
+					)
+					,
 					React.DOM.td(null, 
 						React.DOM.input( {name:"image-browser", 
 							onClick:onClick,
 							type:"radio"} )
+					)
 					)
 				)
 			);
@@ -239,11 +256,6 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 				React.DOM.p( {className:"centered"}, React.DOM.em(null, "(no images)"))
 				),
 				React.DOM.label(null, "Label: " ),
-				React.DOM.input( {ref:"label", size:4} ),
-				React.DOM.input( {ref:"path",
-					onClick:this.addImage,
-					type:"button", 
-					value:"Add image"} ),
 				ImageUploader( 
 					{insertNewImage:this.insertNewImage,
 					uploader:this.props.uploader} )

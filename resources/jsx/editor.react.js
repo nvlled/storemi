@@ -10,7 +10,12 @@ var ImagePanel = React.createClass({
 	},
 
 	switchOption: function(index) {
-		this.setState({index: index});
+		if (index != this.state.index)
+			this.setState({index: index});
+		else  {
+			this.setState({index: -1});
+			this.refs.select.getDOMNode().reset();
+		}
 	},
 
 	update: function(data) {
@@ -47,10 +52,10 @@ var ImagePanel = React.createClass({
 				<LabeledImages 
 					images={images} 
 					removeImage={this.removeImage}/>
-				<div>
+				<form ref='select'>
 					Select method:
 					{options}
-				</div>
+				</form>
 				<div>
 					{[
 						<ImageAddByUser 
@@ -194,10 +199,10 @@ var ImageAddByUser = React.createClass({
 	addImage: function() {
 		var label = this.refs.label.getDOMNode();
 		var path = this.state.selectedImage;
-		console.log("->", label, path);
 		if (label.value.length > 0 && path.length > 0)
 			this.props.addImage(label.value, path);
 		label.value = "";
+		this.selectImage(null)
 	},
 
 	selectImage: function(img) {
@@ -209,6 +214,7 @@ var ImageAddByUser = React.createClass({
 		if (!this.props.uploader)
 			return <em>(uploading has been disabled)</em>
 
+		var selectedImage = this.state.selectedImage;
 		var images = this.state.images;
 		var rows = _.map(images, function(path) {
 			var onClick = this.selectImage.bind(this, path);
@@ -216,11 +222,22 @@ var ImageAddByUser = React.createClass({
 				<tr>
 					<td><img className='thumbnail' src={path} /></td>
 					<td><a href={path} >{path}</a></td>
+					{renderIf(selectedImage == path)(
+					<td>
+						<label>Label: </label>
+						<input ref='label' size={4} />
+						<input ref='path'
+							onClick={this.addImage}
+							type='button' 
+							value='Add image' />
+					</td>
+					,
 					<td>
 						<input name='image-browser' 
 							onClick={onClick}
 							type='radio' />
 					</td>
+					)}
 				</tr>
 			);
 		}.bind(this));
@@ -239,11 +256,6 @@ var ImageAddByUser = React.createClass({
 				<p className='centered'><em>(no images)</em></p>
 				)}
 				<label>Label: </label>
-				<input ref='label' size={4} />
-				<input ref='path'
-					onClick={this.addImage}
-					type='button' 
-					value='Add image' />
 				<ImageUploader 
 					insertNewImage={this.insertNewImage}
 					uploader={this.props.uploader} />
