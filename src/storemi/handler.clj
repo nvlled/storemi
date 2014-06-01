@@ -8,7 +8,7 @@
     [compojure.handler :as handler]
     [compojure.route :as route]
     [storemi.session :refer [make-store]]
-    [storemi.models.db :refer [tables-initialized?]]
+    [storemi.models.db :as db]
     [storemi.models.user :refer [create-user-table]]
     [storemi.models.story :refer [create-story-table]]
     ))
@@ -42,7 +42,8 @@
 
 (defn init []
   (println "storemi is starting") 
-  (when-not (tables-initialized?)
+  (db/test-connection)
+  (when-not (db/tables-initialized?)
     (create-user-table)
     (create-story-table)))
 

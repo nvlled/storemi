@@ -1,4 +1,6 @@
 (ns storemi.repl
+  (:require
+    [storemi.settings :refer [default-port]])
   (:use storemi.handler
         ring.server.standalone
         [ring.middleware file-info file]))
@@ -24,7 +26,7 @@
 (defn start-server
   "used for starting the server in development mode from REPL"
   [& [port]]
-  (let [port (if port (Integer/parseInt port) 8080)]
+  (let [port (if port (Integer/parseInt port) default-port)]
     (stop-server)
     (reset! server
             (serve (get-handler)

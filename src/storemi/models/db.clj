@@ -16,8 +16,7 @@
 (def db
   (or (System/getenv "DATABASE_URL")
       (merge
-        {:subprotocol "postgresql"
-         :subname "//127.0.0.1:5432/demitalesdb"}
+        settings/default-db
         (read-credentials))))
 
 
@@ -78,10 +77,17 @@
 (defn tables-initialized? []
   (try
     (query [(str "select * from "
-                 (apply str (interpose "," known-tables)))])
+                 (apply str (interpose "," known-tables))
+                 " limit 1")]) 
     true
     (catch Exception e false)))
 
-
+(defn test-connection []
+  (try
+    (query ["select 1" ])
+    (catch Exception e 
+      (println "*** Failed to connect to database: " (.getMessage e))
+      (println "*** Configure default-db at src/storemi/settings.clj")
+      (System/exit 1))))
 
 
