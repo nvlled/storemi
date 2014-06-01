@@ -25,6 +25,12 @@ This is a stub. [a: Link to scene A]. Say some stuff here. Some [b: Link to scen
 *** (1.2) Scene A
 Stuffs and stuffs. Saying about stuff here. {a: Link to chapter 2} and [b: link to scene C]. Oh yeah, more stuff to say.
 
+You see a sample image
+  
+<sample: A text describing the image>
+
+You are enlightened.
+
 # a: 2
 # b: 1.4
   
@@ -55,6 +61,9 @@ Got it, your stuffname is ++stuffname++. Well then, off to {a: chapter 3} then, 
 
 *** (2.1) some stuff scene
 saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're having huh. Also, stuff some more stuff on the stuff.
+
+---[images]---
+# sample: /site-images/sample-a.png
   ")
 
 (defn render-template [& [title synopsis]]
