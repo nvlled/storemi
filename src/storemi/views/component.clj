@@ -91,47 +91,6 @@
    [:br]
    [:input {:type :submit :value "Create"}]])
 
-;;(defn added-images [& [images]]
-;;  (let [render 
-;;        (fn [image]
-;;          (list
-;;            [:td [:img.thumbnail {:src (:path image)}]]
-;;            [:td [:a.path {:href (:path image)}] (:path image)] 
-;;            [:td [:a.remove {:href "x"}] "[remove]"]))]
-;;    [:div.added-images
-;;     [:h3 "Images"]
-;;     [:table
-;;      (map #(do [:tr (render %)]) images)
-;;      [:tr.template (render {})]]]))
-;;
-;;(defn image-uploader []
-;;  [:div.image-uploader
-;;   [:p [:input {:type :file}]]
-;;   [:p [:label "Image label: " [:input {:size 5}]]
-;;    [:input {:type :button :value  "Upload and add"}]
-;;    [:input {:type :button :value "Add locally"}]]])
-;;
-;;(defn image-browser [& [images]]
-;;  (let [render
-;;        (fn [image]
-;;          (list
-;;            [:td [:img {:src (:path image)}]]
-;;            [:td [:a {:href (:path image)} (:path image)]]
-;;            [:td [:input {:type :radio :name "image-browser"}]]))]
-;;    [:div.image-browser
-;;     [:table
-;;      (map #(do [:tr (render %)]) images)
-;;      [:tr.template (render {})]]
-;;     [:p 
-;;      [:label "Image label: " [:input {:size 5}]]
-;;      [:input {:type :button :value "Add"}]]])) 
-;;
-;;(defn url-browser []
-;;  [:div.url-browser
-;;   [:p "Enter url: " [:input]]
-;;   [:p [:label "Image label: " [:input {:size 5}]]]
-;;   [:input {:type :button :value "Add"}]])
-
 (defn editing-options []
   [:div.editing-options
    [:h4 "Editing options"]
@@ -148,15 +107,20 @@
          "Hide warnings"]]
     ]])
 
+;(defn edit-button-panel [story]
+;  (if (:published story)
+;    (list
+;      [:input {:name "draft" :type :submit :value "Save as draft"}]
+;      [:input {:name "save" :type :submit :value "Save"}]
+;      [:input {:name "view" :type :submit :value "View"}])
+;    (list
+;      [:input {:name "draft" :type :submit :value "Save as draft"}]
+;      [:input {:name "published" :type :submit :value "Publish"}])))
+
 (defn edit-button-panel [story]
-  (if (:published story)
-    (list
-      [:input {:name "draft" :type :submit :value "Save as draft"}]
-      [:input {:name "save" :type :submit :value "Save"}]
-      [:input {:name "view" :type :submit :value "View"}])
-    (list
-      [:input {:name "draft" :type :submit :value "Save as draft"}]
-      [:input {:name "published" :type :submit :value "Publish"}])))
+  [:div
+   [:input {:name "save" :type :submit :value "Save"}]
+   [:input {:name "saview" :type :submit :value "Save and view"}]])
 
 (defn story-editor [story]
   [:div.editor
@@ -169,11 +133,11 @@
             :method "POST"}
      [:input {:name "storyTitle" :type :hidden }]
      [:input {:name "synopsis" :type :hidden }]
-
      [:textarea {:name "script"} (:script story)]
      (edit-button-panel story)
      [:div#images]
      (editing-options)]]
    [:div {:id "view"}]])
+
 
 

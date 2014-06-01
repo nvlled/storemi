@@ -55,15 +55,13 @@
         id (:story-id params)
         script (clojure.string/replace 
                  (:script params) "\r" "")
-        published 
-        (-> (select-keys params [:published :save]) empty? not)
         path 
-        (if (empty? (select-keys params [:published :view]))
-          (:uri req)
-          (url/story (sess/username req) id))]
-    (st/update-story id published data script)
+        (if (:saview params)
+          (url/story (sess/username req) id)
+          (:uri req))]
+    (st/update-story id data script)
     (-> (redirect path)
-        (sess/add-notification "Story updated"))))
+        (sess/add-notification "Story saved"))))
 
 (def submit-story
   (enforce

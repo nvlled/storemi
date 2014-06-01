@@ -111,7 +111,7 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
                 (com/read-int id -1)])]
     (= (:username data) username)))
 
-(defn update-story [id published data script]
+(defn update-story [id data script]
   (let [parsed-data (parse-script script)
         data (merge data parsed-data)]
     (println "data-er " data)
@@ -120,7 +120,6 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
       (db/remove-nil 
         {:title (get data :storyTitle)
          :synopsis (get data :synopsis)
-         :published published
          :data (db/json-string data)
          :script script})
       ["id = ?" (com/read-int id -1)])))
