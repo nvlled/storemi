@@ -37,7 +37,7 @@
 
 (def story-creation-rules
   (one-by-one
-    (has-params [:title :synopsis])
+    (has-params [:title])
     user-is-logged-in))
 
 (defn proceed-creation [request]
