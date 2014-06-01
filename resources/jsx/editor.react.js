@@ -84,6 +84,7 @@ var LabeledImages = React.createClass({
 		return (
 			<div>
 				<h4>Labeled Images</h4>
+				{renderIf(rows.length > 0)(
 				<table>
 					<tr>
 						<th>Preview</th>
@@ -92,6 +93,9 @@ var LabeledImages = React.createClass({
 					</tr>
 					<tbody>{rows}</tbody>
 				</table>
+				,
+				<p className='centered'><em>(no images)</em></p>
+				)}
 			</div>
 		);
 	}
@@ -223,6 +227,7 @@ var ImageAddByUser = React.createClass({
 		return (
 			<div>
 				<h4>Uploaded Images</h4>
+				{renderIf(rows.length > 0)(
 				<table>
 					<tr>
 						<th>Preview</th>
@@ -230,17 +235,18 @@ var ImageAddByUser = React.createClass({
 					</tr>
 					<tbody>{rows}</tbody>
 				</table>
+				,
+				<p className='centered'><em>(no images)</em></p>
+				)}
 				<label>Label: </label>
 				<input ref='label' size={4} />
 				<input ref='path'
 					onClick={this.addImage}
 					type='button' 
 					value='Add image' />
-				{renderIf(this.props.upload)(
 				<ImageUploader 
 					insertNewImage={this.insertNewImage}
 					uploader={this.props.uploader} />
-				)}
 			</div>
 		);
 	}

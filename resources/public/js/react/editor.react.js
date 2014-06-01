@@ -84,6 +84,7 @@ var LabeledImages = React.createClass({displayName: 'LabeledImages',
 		return (
 			React.DOM.div(null, 
 				React.DOM.h4(null, "Labeled Images"),
+				renderIf(rows.length > 0)(
 				React.DOM.table(null, 
 					React.DOM.tr(null, 
 						React.DOM.th(null, "Preview"),
@@ -91,6 +92,9 @@ var LabeledImages = React.createClass({displayName: 'LabeledImages',
 						React.DOM.th(null, "Path")
 					),
 					React.DOM.tbody(null, rows)
+				)
+				,
+				React.DOM.p( {className:"centered"}, React.DOM.em(null, "(no images)"))
 				)
 			)
 		);
@@ -223,12 +227,16 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 		return (
 			React.DOM.div(null, 
 				React.DOM.h4(null, "Uploaded Images"),
+				renderIf(rows.length > 0)(
 				React.DOM.table(null, 
 					React.DOM.tr(null, 
 						React.DOM.th(null, "Preview"),
 						React.DOM.th(null, "Path")
 					),
 					React.DOM.tbody(null, rows)
+				)
+				,
+				React.DOM.p( {className:"centered"}, React.DOM.em(null, "(no images)"))
 				),
 				React.DOM.label(null, "Label: " ),
 				React.DOM.input( {ref:"label", size:4} ),
@@ -236,11 +244,9 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 					onClick:this.addImage,
 					type:"button", 
 					value:"Add image"} ),
-				renderIf(this.props.upload)(
 				ImageUploader( 
 					{insertNewImage:this.insertNewImage,
 					uploader:this.props.uploader} )
-				)
 			)
 		);
 	}

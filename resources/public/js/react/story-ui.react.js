@@ -506,8 +506,9 @@ function cl(/* class1, class2, ..., map */) {
 }
 
 function renderIf(yes) {
-	return function(component) {
+	return function(component, other) {
 		if (yes) return component;
+		return other;
 	}
 }
 
