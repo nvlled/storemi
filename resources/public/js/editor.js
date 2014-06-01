@@ -83,13 +83,13 @@ ScriptEditor.prototype.updateScript = function(script) {
 
 ScriptEditor.prototype.addImage = function(label, path) {
 	var figs = {}; figs[label] = path;
-	var script = updateFigures(figs, this.textarea.value);
+	var script = updateImageLinks(figs, this.textarea.value);
 	this.updateScript(script);
 }
 
 ScriptEditor.prototype.removeImage = function(label) {
 	var figs = {}; figs[label] = null;
-	var script = updateFigures(figs, this.textarea.value);
+	var script = updateImageLinks(figs, this.textarea.value);
 	this.updateScript(script);
 }
 
@@ -155,19 +155,19 @@ function setupEditingOptions(storyComponent) {
 }
 
 
-function updateImages(figures) {
-	var images = sel(document, "#images .added-images table tbody");
-	var templ = sel(images, ".template").cloneNode(true);
-	templ.style.display = 'inherit';
-
-	_.each(images.children, function(e) { e.remove() });
-	_.each(figures, function(path, label) {
-		var tr = templ.cloneNode(true);
-		sel(tr, ".thumbnail").src = path;
-		sel(tr, ".path").textContent = path;
-		images.appendChild(tr);
-	});
-}
+//function updateImages(images) {
+//	var images = sel(document, "#images .added-images table tbody");
+//	var templ = sel(images, ".template").cloneNode(true);
+//	templ.style.display = 'inherit';
+//
+//	_.each(images.children, function(e) { e.remove() });
+//	_.each(images, function(path, label) {
+//		var tr = templ.cloneNode(true);
+//		sel(tr, ".thumbnail").src = path;
+//		sel(tr, ".path").textContent = path;
+//		images.appendChild(tr);
+//	});
+//}
 
 function listUserImages(username, fn) {
 	var xhr = new XMLHttpRequest();

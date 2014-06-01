@@ -23,7 +23,7 @@ var MARKER = {
     SCENE:      "***",
     SCRIPT_END: "************",
 	DEFAULTS: "---[defaults]---",
-	FIGURES:    "---[figures]---",
+	FIGURES:    "---[images]---",
 }
 
 var TPAIRS = {
@@ -54,7 +54,7 @@ function parseScript(scripts) {
         chapters: parseChapters(lines),
         defaultBindings: parseBindings(lines, titleIndex),
 		mappings: getMappings(lines),
-		figures: parseFigures(lines),
+		images: parseImageLinks(lines),
     }
 }
 
@@ -62,10 +62,10 @@ function makeLink(key, val) {
 	return MARKER.LINK+" "+key+": "+val;
 }
 
-function updateFigures(figures, script) {
-	figures = _.clone(figures);
+function updateImageLinks(images, script) {
+	images = _.clone(images);
 	var lines = script.split("\n");
-	var i = nextFigureIndex(0, lines);
+	var i = nextImageIndex(0, lines);
 	var end = nextLineMarkers(i+1, lines);
 	if (end < 0) end = lines.length;
 
@@ -80,25 +80,25 @@ function updateFigures(figures, script) {
 			break;
 		i = j;
 		var m = parseLink(lines[i]);
-		var val = figures[m.key];
+		var val = images[m.key];
 		if (val) {
 			lines[i] = makeLink(m.key, val);
-			delete figures[m.key];
+			delete images[m.key];
 		} else if (val === null){
 			lines.splice(i, 1); // delete
 			i--;
-			delete figures[m.key];
+			delete images[m.key];
 		}
 	}
 
-	var links = _.map(figures, function(val, key) {
+	var links = _.map(images, function(val, key) {
 		return makeLink(key, val);
 	});
 	lines.splice.apply(lines, [i+1, -1].concat(links));
 	return lines.join("\n");
 }
 
-function parseFigures(lines) {
+function parseImageLinks(lines) {
 	var  i = 0;
 	while (i < lines.length) {
 		var line = lines[i];
@@ -106,7 +106,7 @@ function parseFigures(lines) {
 			break;
 		i++;
 	}
-	var end = nextFigureIndex(i, lines);
+	var end = nextImageIndex(i, lines);
 	if (end < 0) end = lines.length;
     lines = lines.slice(i, end);
     return getMappings(lines) || {};
@@ -280,7 +280,7 @@ function beginningPairs() {
 
 function getSceneText(lines, index) {
     index = index || 0;
-	var end = nextFigureIndex(index, lines);
+	var end = nextImageIndex(index, lines);
     if (end < 0)
         end = nextLinkIndex(index, lines);
 	if (end < 0)
@@ -385,7 +385,7 @@ function nextLineMarkers(index, lines) {
 	return next;
 }
 
-function nextFigureIndex(index, lines) {
+function nextImageIndex(index, lines) {
     var next = nextIndex(index, lines, function(line) {
         return isMarkedWith(line, MARKER.FIGURES);
     });
@@ -573,8 +573,7 @@ function startsWith(s, prefix) {
 
 root || (root = {});
 root.parseScript = parseScript;
-root.updateFigures = updateFigures;
-
+root.updateImageLinks = updateImageLinks
 
 })(this);
 

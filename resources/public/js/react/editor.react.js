@@ -46,7 +46,7 @@ var ImagePanel = React.createClass({displayName: 'ImagePanel',
 		}.bind(this));
 		var index = this.state.index;
 
-		var images = this.state.data.figures;
+		var images = this.state.data.images;
 		return (
 			React.DOM.div(null, 
 				LabeledImages( 
