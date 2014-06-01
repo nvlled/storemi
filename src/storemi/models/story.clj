@@ -185,12 +185,15 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
   (let [limit (or limit 10)
         limit (min limit 100)]
     (db/query 
-      ["select id, title, synopsis, username from stories limit ?" 
+      ["select id, title, synopsis, username from stories 
+       order by id desc
+       limit ?" 
        limit])))
 
 (defn user-stories [username]
   (db/query 
-    ["select id, title, username from stories where username = ?" 
+    ["select id, title, username from stories where username = ?
+     order by id desc" 
      username]))
 
 (defn delete-story [username id]
@@ -201,7 +204,6 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
 (defn from-request [{params :params}]
   (select-keys 
     params [:id :username :title :body :script :synopsis :data]))
-
 
 
 
