@@ -103,8 +103,7 @@ var Story = React.createClass({displayName: 'Story',
 						{data:story.chapters,
 						view:this.state.view} )
 				),
-				chapterComponent,
-				React.DOM.div( {className:"spacing"})
+				chapterComponent
 			)
 		);
 	}
