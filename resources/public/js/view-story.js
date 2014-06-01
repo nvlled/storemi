@@ -1,20 +1,18 @@
 
 window.addEventListener("load", function() {
-	var url = document.querySelector("#data-path").value;
-	fetchStoryData(url, function(script) {
-		var data = parseScript(script);
+	var script = document.querySelector("#story-script").value;
+	var data = parseScript(script);
 
-		var storyComponent = Story({ 
-			data: parseScript(script),
-			configMode: readingMode,
-			editURL: document.querySelector("#edit-url").value,
-		});
-
-		React.renderComponent(
-			storyComponent,
-			document.getElementById("contents")
-		);
+	var storyComponent = Story({ 
+		data: parseScript(script),
+		configMode: readingMode,
+		editURL: document.querySelector("#edit-url").value,
 	});
+
+	React.renderComponent(
+		storyComponent,
+		document.getElementById("contents")
+	);
 });
 
 function fetchStoryData(url, fn) {

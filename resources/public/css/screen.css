@@ -180,3 +180,6 @@ form.story-settings input[name=close]{
 	visibility: hidden;
 }
 
+#story-script {
+	display: none;
+}

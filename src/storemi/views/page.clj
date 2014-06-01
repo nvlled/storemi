@@ -152,6 +152,9 @@
                 (url/story-data
                   (:username params)
                   (:story-id params))}]
+       [:textarea {:id "story-script"
+                   :type :hidden}
+        (:script story)]
        [:div#contents]]
       :scripts ["/js/react.min.js"
                 "/js/parser.js"
