@@ -280,11 +280,11 @@ function beginningPairs() {
 
 function getSceneText(lines, index) {
     index = index || 0;
-    var end = nextIndex(index, lines, function(line) {
-        return isMarkedWith(line, MARKER.LINK);
-    });
+	var end = nextFigureIndex(index, lines);
     if (end < 0)
-        end = lines.length;
+        end = nextLinkIndex(index, lines);
+	if (end < 0)
+		end = lines.length;
     return lines.slice(index, end).join("\n");
 }
 
@@ -462,7 +462,7 @@ Token.processors = {
 
     INPUT:  function(self, text) {
         var split = text.split(":");
-
+		self.buttonVal = "ok";
         if (split.length == 2) {
             self.label = split[0];
             split = split[1].split(",").map(function(x) {
@@ -470,7 +470,6 @@ Token.processors = {
             });
 
 			self.text = split[0];
-			self.buttonVal = "ok";
             if (split.length >= 2) {
                 self.buttonVal = split[1];
             } 
