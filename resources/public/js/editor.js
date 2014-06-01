@@ -107,7 +107,7 @@ function persistMappings(mappings) {
 
 function readingMode(config) {
 	var storyComponent = this;
-	var chIndex = !!storyComponent.selectedChapter;
+	var chIndex = !!storyComponent.currentChapter();
 	return _.extend(config, {
 		hideSceneIndex: true,
 		hideSynopsis: false,
@@ -187,7 +187,6 @@ Uploader.path = "/upload"
 
 Uploader.prototype.send = function(form, handler) {
 	var xhr = new XMLHttpRequest();
-	console.log("uploading some shit", form, handler);
 
 	var progress = bind(handler, "progress");
 	var success = bind(handler, "success");
@@ -195,7 +194,6 @@ Uploader.prototype.send = function(form, handler) {
 
 	xhr.upload.addEventListener("progress", progress);
 	xhr.addEventListener("load", function() {
-		console.log(xhr, "status:", xhr.status);
 		if (xhr.status / 100 == 2) {
 			success(xhr);
 		} else {

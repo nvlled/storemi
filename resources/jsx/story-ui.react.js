@@ -98,6 +98,20 @@ var Story = React.createClass({
 				{renderIf(!view.config.hideWarnings)(
 						<div>{warnings}</div>
 				)}
+				<div className='chapter-history'>
+					<a href='#' 
+						className={cl({invisible: !view.hasPrevious()})}
+						onClick={view.backChapter.bind(view)}>
+						[back]
+					</a>
+					<span />
+					<a href='#' 
+						style={{"float": "right"}}
+						className={cl({invisible: !view.hasNext()})}
+						onClick={view.forwardChapter.bind(view)}>
+						[forward]
+					</a>
+				</div>
 				{renderIf(!view.config.hideChapterIndex)(
 					<ChapterIndex
 						data={story.chapters}
@@ -408,10 +422,6 @@ var Scene = React.createClass({
 
 	br: function() { return <br /> },
 
-	componentDidMount: function() {
-		console.log(document.querySelector(".scene-title"));
-	},
-
 	renderContents: function(scene) {
 		var chapter = this.props.chapter;
 		var view = this.props.view;
@@ -574,14 +584,97 @@ Bindings.prototype.get = function(key) {
 	return this.env[key];
 }
 
+function History(size) {
+	this.index = -1;
+	this.items = [];
+	this.histSize = size || 10;
+}
+
+History.prototype.back = function() {
+	if (this.hasPrevious())
+		this.index--;
+}
+
+History.prototype.forward = function() {
+	if (this.hasNext())
+		this.index++;
+}
+
+History.prototype.hasPrevious = function() {
+	return this.index > 0;
+}
+
+History.prototype.hasNext = function() {
+	return this.index < this.items.length - 1;
+}
+
+History.prototype.visit = function(item, compare) {
+	if (compare) {
+		if (compare(this.get(), item))
+			return;
+	} else if (this.get() == item){
+		return;
+	}
+
+	var end = this.items.length;
+	if (this.index < this.histSize-1)
+		this.index++;
+	else
+		this.items.shift();
+	this.items.splice(this.index, end, item);
+}
+
+History.prototype.get = function() {
+	return this.items[this.index];
+}
+
+function testHistory() {
+	var h = new History();
+	h.visit("a");
+	console.assert(h.get() == "a");
+	h.back();
+	console.assert(h.get() == "a");
+	h.forward(); h.forward();
+	console.assert(h.get() == "a");
+	h.visit("b");
+	h.visit("c");
+	console.assert(h.get() == "c");
+	h.back();
+	console.assert(h.get() == "b");
+	h.back();
+	console.assert(h.get() == "a");
+	h.forward(); h.forward(); h.forward();
+	console.assert(h.get() == "c");
+	h.visit("d");
+	h.visit("e");
+	h.back(); h.back();
+	console.assert(h.get() == "c");
+	h.visit("f");
+	console.assert(h.get() == "f");
+	console.assert(h.items.length == 4);
+	h.back(); h.back();
+	h.back(); h.back();
+	console.assert(h.get() == "a");
+	h.visit("x");
+	console.assert(h.get() == "x");
+	console.assert(h.items.length == 2);
+
+	_.each(_.range(1, h.histSize*2), function(x) {
+		h.visit(x);
+	});
+	console.assert(h.items.length == h.histSize);
+}
+
+testHistory();
+
 function ViewState(component, config, mode) {
 	this.bindings = new Bindings();
 	this.component = component;
-	this.selectedChapter = null;
 	this.selectedScene = {};
 	this.subscenes = {};
 	this.setConfigMode(mode);
 	this.showStorySettings = false;
+	this.chapterHist= new History(5);
 
 	this.config = _.extend({
 		scrollToView: true,
@@ -621,17 +714,37 @@ ViewState.prototype = {
 		return this.reconfigure(config);
 	},
 
+	backChapter: function() {
+		this.chapterHist.back();
+		return this.update();
+	},
+
+	forwardChapter: function() {
+		this.chapterHist.forward();
+		return this.update();
+	},
+
+	hasPrevious: function() {
+		return this.chapterHist.hasPrevious();
+	},
+
+	hasNext: function() {
+		return this.chapterHist.hasNext();
+	},
+
 	selectChapter: function(chapter) {
-		this._clearSubscene(chapter, 
-			this.getSelectedScene(chapter));
-		this.selectedChapter = chapter;
+		this.chapterHist.visit(chapter, function(a, b) {
+			if (a && b)
+				return a.label == b.label;
+		});
 		return this.update(Chapter.selector(chapter));
 	},
 
 	// TODO: Change parameter to story
 	getSelectedChapter: function(chapters) {
-		if (this.selectedChapter) {
-			var label = this.selectedChapter.label;
+		var chapter = this.chapterHist.get();
+		if (chapter) {
+			var label = chapter.label;
 			return _.findWhere(chapters, {label: label});
 		}
 	},
@@ -657,6 +770,10 @@ ViewState.prototype = {
 		return this.subscenes[chapter.label];
 	},
 
+	currentChapter: function() {
+		return this.chapterHist.get();
+	},
+
 	selectSubscene: function(chapter, scene, subscene) {
 		this._clearSubscene(chapter, subscene);
 		this.subscene(chapter)[scene.label] = subscene;
@@ -677,9 +794,6 @@ ViewState.prototype = {
 	},
 
 }
-
-
-
 
 
 

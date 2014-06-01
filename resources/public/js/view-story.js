@@ -1,11 +1,8 @@
 
 window.addEventListener("load", function() {
 	var url = document.querySelector("#data-path").value;
-	console.log("data-path", url);
 	fetchStoryData(url, function(script) {
 		var data = parseScript(script);
-		console.log("script", script);
-		console.log("data", data);
 
 		var storyComponent = Story({ 
 			data: parseScript(script),
@@ -32,7 +29,7 @@ function fetchStoryData(url, fn) {
 
 function readingMode(config) {
 	var storyComponent = this;
-	var chIndex = !!storyComponent.selectedChapter;
+	var chIndex = !!storyComponent.currentChapter();
 	return _.extend(config, {
 		hideSceneIndex: true,
 		hideSynopsis: false,

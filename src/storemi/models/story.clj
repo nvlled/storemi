@@ -123,7 +123,6 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
 (defn update-story [id data script]
   (let [parsed-data (parse-script script)
         data (merge data parsed-data)]
-    (println "data-er " data)
     (db/update!
       :stories
       (db/remove-nil 

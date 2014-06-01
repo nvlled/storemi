@@ -124,7 +124,6 @@ var ImageUploader = React.createClass({
 	},
 
 	success: function(e) {
-		console.log(e, "tadah");
 		this.setState({status: "idle"});
 		var form = this.refs['upload-form'].getDOMNode();
 		var imgPath = e.responseText;

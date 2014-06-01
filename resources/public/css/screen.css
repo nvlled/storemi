@@ -176,5 +176,7 @@ form.story-settings input[name=close]{
 	margin-right: 13px;;
 }
 
-
+.invisible {
+	visibility: hidden;
+}
 
