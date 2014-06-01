@@ -6,7 +6,7 @@
 (def site-desc "an alternative, scene-based non-linear story narration")
 
 (def site-scripts
-  ["/js/underscore.js"
+  ["/js/underscore-min.js"
    "/js/site.js"])
 
 (def site-styles

@@ -153,7 +153,7 @@
                   (:username params)
                   (:story-id params))}]
        [:div#contents]]
-      :scripts ["/js/react.js"
+      :scripts ["/js/react.min.js"
                 "/js/parser.js"
                 "/js/react/story-ui.react.js"
                 "/js/view-story.js"])))
@@ -185,7 +185,7 @@
               :value (session/username request)}]
      (cmpt/story-editor 
        (st/story-match-by request))]
-    :scripts ["/js/react.js"
+    :scripts ["/js/react.min.js"
               "/js/parser.js"
               "/js/react/story-ui.react.js"
               "/js/react/editor.react.js"
