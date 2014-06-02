@@ -7,6 +7,7 @@
     [storemi.views.layout :as layout]
     [storemi.urlfor :as url]
     [storemi.lib.tourl :refer [retour detour-param-key]]
+    [storemi.js :as js]
     ))
 
 (defn error [request & [status]]
@@ -155,7 +156,9 @@
        [:textarea {:id "story-script"
                    :type :hidden}
         (:script story)]
-       [:div#contents]]
+       [:div#contents
+        (js/render-story-component (:data story))
+        ]]
       :scripts ["/js/react.min.js"
                 "/js/parser.js"
                 "/js/react/story-ui.react.js"
@@ -179,20 +182,27 @@
          "[cancel]"]]])))
 
 (defn story-edit [{errors :errors :as request}]
-  (layout/common
-    request
-    :body
-    [:div
-     [:input {:id "my-username"
-              :type :hidden
-              :value (session/username request)}]
-     (cmpt/story-editor 
-       (st/story-match-by request))]
-    :scripts ["/js/react.min.js"
-              "/js/parser.js"
-              "/js/react/story-ui.react.js"
-              "/js/react/editor.react.js"
-              "/js/editor.js"]
-    :styles ["/css/editor.css"]))
+  (let [story (st/story-match-by request)]
+    (layout/common
+      request
+      :body
+      [:div
+       [:input {:id "my-username"
+                :type :hidden
+                :value (session/username request)}]
+       [:div.editor
+        (cmpt/story-editor story)
+        [:div {:id "view"} (js/render-story-component (:data story))]]]
+      :scripts ["/js/react.min.js"
+                "/js/parser.js"
+                "/js/react/story-ui.react.js"
+                "/js/react/editor.react.js"
+                "/js/editor.js"]
+      :styles ["/css/editor.css"])))
+
+
+
+
+
 
 

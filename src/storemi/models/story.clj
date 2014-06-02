@@ -1,12 +1,13 @@
 (ns storemi.models.story
   (:require 
-    [clj-rhino :as js]
     [clojure.walk :refer [keywordize-keys]]
     [hiccup.util :refer [escape-html]]
     [clj-http.client :as client]
     [clojure.java.jdbc :as sql]
     [storemi.models.db :as db]
-    [storemi.common :as com]))
+    [storemi.common :as com]
+    [storemi.js :as js]
+    ))
 
 (def script-template
   "
@@ -97,21 +98,9 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
            :synopsis  (escape-html synopsis)})]
     (first response)))
 
-(def parser-scope 
-  (doto (js/new-safe-scope)
-    (js/eval (slurp "resources/public/js/underscore-min.js"))
-    (js/eval (slurp "resources/public/js/parser.js"))))
-
-(defn parse-script [script]
-  (let [sc (js/new-scope nil parser-scope)]
-    (js/set! sc "script" script)
-    (-> (js/eval sc "parseScript(script)")
-        js/from-js
-        keywordize-keys)))
-
 (defn create-story [creator title &[synopsis]]
   (let [script (render-template title (or synopsis))
-        data (parse-script script)]
+        data (js/parse-script script)]
     (insert-story 
       {:username creator
        :script script
@@ -126,7 +115,7 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
     (= (:username data) username)))
 
 (defn update-story [id data script]
-  (let [parsed-data (parse-script script)
+  (let [parsed-data (js/parse-script script)
         data (merge data parsed-data)]
     (db/update!
       :stories

@@ -544,13 +544,12 @@ function scrollViewTo(container, node, step) {
     }, 10);
 }
 
-if (!this.localStorage) {
-	localStorage = {};
-}
+if (!this.localStorage)
+	this.localStorage = {};
+
 function Bindings() {
 	this.env = Bindings.getStorage();
 	this.listeners = {};
-
 }
 
 Bindings.KEYNAME = "__bindings"; // TODO: set to context path instead
@@ -790,6 +789,10 @@ ViewState.prototype = {
 	},
 
 }
+
+
+
+
 
 
 

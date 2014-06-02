@@ -123,21 +123,20 @@
    [:input {:name "saview" :type :submit :value "Save and view"}]])
 
 (defn story-editor [story]
-  [:div.editor
-   [:div {:id "create"}
-    [:input {:id "disable-upload" 
-             :type :hidden
-             :value (when settings/disable-upload "1")}]
-    [:p "script"]
-    [:form {:action (urlfor/story-edit (:username story) (:id story))
-            :method "POST"}
-     [:input {:name "storyTitle" :type :hidden }]
-     [:input {:name "synopsis" :type :hidden }]
-     [:textarea {:name "script"} (:script story)]
-     (edit-button-panel story)
-     [:div#images]
-     (editing-options)]]
-   [:div {:id "view"}]])
+  [:div {:id "create"}
+   [:input {:id "disable-upload" 
+            :type :hidden
+            :value (when settings/disable-upload "1")}]
+   [:p "script"]
+   [:form {:action (urlfor/story-edit (:username story) (:id story))
+           :method "POST"}
+    [:input {:name "storyTitle" :type :hidden }]
+    [:input {:name "synopsis" :type :hidden }]
+    [:textarea {:name "script"} (:script story)]
+    (edit-button-panel story)
+    [:div#images]
+    (editing-options)]]
+  )
 
 
 

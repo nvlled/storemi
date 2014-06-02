@@ -544,6 +544,9 @@ function scrollViewTo(container, node, step) {
     }, 10);
 }
 
+if (!this.localStorage)
+	this.localStorage = {};
+
 function Bindings() {
 	this.env = Bindings.getStorage();
 	this.listeners = {};
@@ -571,14 +574,6 @@ Bindings.prototype.set = function(key, value) {
 		fn(value);
 	});
 }
-
-//Bindings.prototype.subscribe = function(key, fn) {
-//	var m = this.listeners[key];
-//	if (!m) {
-//		m = this.listeners[key] = [];
-//	}
-//	m.push(fn);
-//}
 
 Bindings.prototype.get = function(key) {
 	return this.env[key];
@@ -665,7 +660,7 @@ function testHistory() {
 	console.assert(h.items.length == h.histSize);
 }
 
-testHistory();
+//testHistory();
 
 function ViewState(component, config, mode) {
 	this.bindings = new Bindings();
@@ -794,6 +789,10 @@ ViewState.prototype = {
 	},
 
 }
+
+
+
+
 
 
 
