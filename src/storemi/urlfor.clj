@@ -16,6 +16,9 @@
 (defurl user-index story-index "/:username")
 
 (defurl story user-index "/:story-id")
+(defurl chapter story "/chapter/:chapter")
+(defurl scene chapter "/scene/:scene")
+
 (defurl story-delete story "/delete")
 (defurl story-edit story "/edit")
 

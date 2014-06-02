@@ -40,12 +40,10 @@
 (defn key->sym [k]
   (-> k name symbol))
 
-; "/testing/:xyz/asdf"
-; "testing" :xyz "asdf"
-
 (defn make-url-fn [args]
   (fn [& vals]
     (let [keys (filter keyword? args)
+          vals (concat vals (drop (count vals) keys))
           m (zipmap keys vals)]
       (substitute m args))))
 
@@ -75,10 +73,6 @@
         ;~(make-keyed-url-fn (destruct-url url)))
       (def ~(symname name path-suffix) 
         ~url))))
-
-
-
-
 
 
 
