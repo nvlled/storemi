@@ -584,7 +584,7 @@ function History(size, home) {
 	this.index = -1;
 	this.items = [];
 	this.histSize = size || 10;
-	this.atHome = false;
+	this.atHome = true;
 	this.home = home || {};
 }
 
@@ -687,7 +687,7 @@ function ViewState(component, config, mode) {
 	this.subscenes = {};
 	this.setConfigMode(mode);
 	this.showStorySettings = false;
-	this.chapterHist= new History(5);
+	this.chapterHist= new History(5, null);
 
 	this.config = _.extend({
 		scrollToView: true,
@@ -790,6 +790,10 @@ ViewState.prototype = {
 
 	currentChapter: function() {
 		return this.chapterHist.get();
+	},
+
+	atHome: function() {
+		return this.chapterHist.atHome;
 	},
 
 	selectSubscene: function(chapter, scene, subscene) {

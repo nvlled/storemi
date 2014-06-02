@@ -27,11 +27,11 @@ function fetchStoryData(url, fn) {
 
 function readingMode(config) {
 	var storyComponent = this;
-	var chIndex = !!storyComponent.currentChapter();
+	var hideChIndex = !storyComponent.atHome() 
 	return _.extend(config, {
 		hideSceneIndex: true,
 		hideSynopsis: false,
-		hideChapterIndex: chIndex,
+		hideChapterIndex: hideChIndex,
 	});
 }
 
