@@ -22,6 +22,7 @@ You can either:
 ```
 
 Change the fields according to your database setup.
+Tested to work in postgresql at the moment.
 
 ## Running
 
@@ -38,7 +39,7 @@ it may take a while. Then open your browser at localhost:6060
 Seems to be working at the moment. A demo can be viewed [here](http://storemi.herokuapp.com).
 
 ## TODO
-* Server-side html rendering
+* Downloadable story page for offline use
 * Fix homepage
 
 
