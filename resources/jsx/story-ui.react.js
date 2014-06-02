@@ -72,10 +72,11 @@ var Story = React.createClass({
 
 		return (
 			<div className='story'>
+
 				<h1 className='story-title'>
 					<ChapterLink view={view} 
 						active={!chapter} 
-						chapter={null}>
+						chapter={{}}>
 						{story.storyTitle}
 					</ChapterLink>
 					{renderIf(this.props.editURL)(
@@ -579,19 +580,33 @@ Bindings.prototype.get = function(key) {
 	return this.env[key];
 }
 
-function History(size) {
+function History(size, home) {
 	this.index = -1;
 	this.items = [];
 	this.histSize = size || 10;
+	this.atHome = false;
+	this.home = home || {};
+}
+
+History.prototype.runaway = function() {
+	this.atHome = false;
+}
+
+History.prototype.goHome = function() {
+	this.atHome = true;
 }
 
 History.prototype.back = function() {
-	if (this.hasPrevious())
+	if (this.atHome)
+		this.runaway();
+	else if (this.hasPrevious())
 		this.index--;
 }
 
 History.prototype.forward = function() {
-	if (this.hasNext())
+	if (this.atHome)
+		this.runaway();
+	else if (this.hasNext())
 		this.index++;
 }
 
@@ -604,6 +619,7 @@ History.prototype.hasNext = function() {
 }
 
 History.prototype.visit = function(item, compare) {
+	this.runaway();
 	if (compare) {
 		if (compare(this.get(), item))
 			return;
@@ -620,6 +636,8 @@ History.prototype.visit = function(item, compare) {
 }
 
 History.prototype.get = function() {
+	if (this.atHome)
+		return this.home;
 	return this.items[this.index];
 }
 
@@ -728,10 +746,15 @@ ViewState.prototype = {
 	},
 
 	selectChapter: function(chapter) {
-		this.chapterHist.visit(chapter, function(a, b) {
-			if (a && b)
-				return a.label == b.label;
-		});
+		var hist = this.chapterHist;
+		if (!chapter.label)
+			hist.goHome();
+		else
+			hist.visit(chapter, function(a, b) {
+				if (a && b)
+					return a.label == b.label;
+				return a == b;
+			});
 		return this.update(Chapter.selector(chapter));
 	},
 
