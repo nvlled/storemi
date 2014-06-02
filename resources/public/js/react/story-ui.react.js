@@ -3,11 +3,12 @@
 var Story = React.createClass({displayName: 'Story',
 
     getInitialState: function() {
+		var paths = this.props.paths;
 		var config = this.props.config;
 		var configMode = this.props.configMode;
 		return {
 			data: this.props.data,
-			view: new ViewState(this, config, configMode),
+			view: new ViewState(this, config, configMode, paths),
 		}
 	},
 
@@ -177,9 +178,11 @@ var ChapterLink = React.createClass({displayName: 'ChapterLink',
 		var chapter = this.props.chapter;
 		var className = cl({ active: this.props.active });
 		var handler = view.selectChapter.bind(view, chapter);
+		var href =
+			view.urlfor.get('chapter', chapter.label);
 		return (
 			React.DOM.a( {className:className,
-				href:"#", 
+				href:href,
 				onClick:handler}, 
 				this.props.children || chapter && chapter.title
 			)
@@ -197,7 +200,8 @@ var ChapterIndex = React.createClass({displayName: 'ChapterIndex',
 			var active = selChapter && selChapter.label == chapter.label;
 			return (
 				React.DOM.li(null, 
-					ChapterLink( {chapter:chapter, 
+					ChapterLink( 
+						{chapter:chapter, 
 						active:active, 
 						view:view} )
 				)
@@ -222,8 +226,10 @@ var SceneIndex = React.createClass({displayName: 'SceneIndex',
 			var className = cl({
 				active: selScene && selScene.label == scene.label
 			});
+			var href = 
+				view.urlfor.get('scene', chapter.label, scene.label);
 			return (
-				React.DOM.li(null, React.DOM.a( {href:scene.label, 
+				React.DOM.li(null, React.DOM.a( {href:href, 
 						onClick:handler,
 						className:className}, 
 						scene.title
@@ -296,7 +302,7 @@ var SceneLink = React.createClass({displayName: 'SceneLink',
 			active: this.props.active
 		});
 		return (
-			React.DOM.a(  {href:"x", 
+			React.DOM.a(  {href:this.props.href,
 				onClick:this.props.onClick, 
 				className:classes}, 
 				this.props.children
@@ -337,9 +343,16 @@ var Scene = React.createClass({displayName: 'Scene',
         var toScene = {label: mappings[label] || ""};
 		var active = subscene && 
 			toScene.label == subscene.label ;
+		var chapter = this.props.chapter;
+		var view = this.props.view;
+		var href = 
+			view.urlfor.get('scene', chapter.label, toScene.label);
         return (
 			SceneLink( 
-				{onClick:this.subsceneHandler(toScene),
+				{href:href,
+				toScene:toScene,
+				chapter:this.props.chapter,
+				onClick:this.subsceneHandler(toScene),
 				active:active}, 
 				elem.text
 			)
@@ -394,6 +407,9 @@ var Scene = React.createClass({displayName: 'Scene',
             }
 		}.bind(this);
 
+		var chapter = this.props.chapter;
+		var href = 
+			view.urlfor.get('scene', chapter.label, toScene.label);
         return (
             React.DOM.span( {className:"game-input"}, 
                 React.DOM.input( 
@@ -401,6 +417,9 @@ var Scene = React.createClass({displayName: 'Scene',
                     defaultValue:value,
                     onKeyUp:onKeyUp} ),
 				SceneLink( {ref:"link", 
+					href:href,
+					toScene:toScene,
+					chapter:this.props.chapter,
 					onClick:handler,
 					active:active}, 
                     "[",elem.buttonVal,"]"
@@ -680,7 +699,7 @@ function testHistory() {
 
 //testHistory();
 
-function ViewState(component, config, mode) {
+function ViewState(component, config, mode, paths) {
 	this.bindings = new Bindings();
 	this.component = component;
 	this.selectedScene = {};
@@ -688,6 +707,7 @@ function ViewState(component, config, mode) {
 	this.setConfigMode(mode);
 	this.showStorySettings = false;
 	this.chapterHist= new History(5, null);
+	this.urlfor = new UrlFor(paths);
 
 	this.config = _.extend({
 		scrollToView: true,
@@ -700,6 +720,7 @@ function ViewState(component, config, mode) {
 }
 
 ViewState.prototype = {
+
 	setConfigMode: function(mode) {
 		this.configMode = mode || _.identity;
 	},
@@ -818,10 +839,21 @@ ViewState.prototype = {
 }
 
 
+function UrlFor(paths) {
+	this.paths = paths || [];
+}
 
+UrlFor.prototype.get = function(name /*, args... */) {
+	var args = _.rest(arguments);
+	var url = this.paths[name];
+	if (!url)
+		return "";
 
-
-
+	var pat = /:\w+/;
+	return _.reduce(args, function(url, arg) {
+		return url.replace(pat, arg);
+	}, url);
+}
 
 
 

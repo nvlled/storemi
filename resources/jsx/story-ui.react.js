@@ -3,11 +3,12 @@
 var Story = React.createClass({
 
     getInitialState: function() {
+		var paths = this.props.paths;
 		var config = this.props.config;
 		var configMode = this.props.configMode;
 		return {
 			data: this.props.data,
-			view: new ViewState(this, config, configMode),
+			view: new ViewState(this, config, configMode, paths),
 		}
 	},
 
@@ -177,9 +178,11 @@ var ChapterLink = React.createClass({
 		var chapter = this.props.chapter;
 		var className = cl({ active: this.props.active });
 		var handler = view.selectChapter.bind(view, chapter);
+		var href =
+			view.urlfor.get('chapter', chapter.label);
 		return (
 			<a className={className}
-				href='#' 
+				href={href}
 				onClick={handler}>
 				{this.props.children || chapter && chapter.title}
 			</a>
@@ -197,7 +200,8 @@ var ChapterIndex = React.createClass({
 			var active = selChapter && selChapter.label == chapter.label;
 			return (
 				<li>
-					<ChapterLink chapter={chapter} 
+					<ChapterLink 
+						chapter={chapter} 
 						active={active} 
 						view={view} />
 				</li>
@@ -222,8 +226,10 @@ var SceneIndex = React.createClass({
 			var className = cl({
 				active: selScene && selScene.label == scene.label
 			});
+			var href = 
+				view.urlfor.get('scene', chapter.label, scene.label);
 			return (
-				<li><a href={scene.label} 
+				<li><a href={href} 
 						onClick={handler}
 						className={className}>
 						{scene.title}
@@ -296,7 +302,7 @@ var SceneLink = React.createClass({
 			active: this.props.active
 		});
 		return (
-			<a  href='x' 
+			<a  href={this.props.href}
 				onClick={this.props.onClick} 
 				className={classes}>
 				{this.props.children}
@@ -337,8 +343,15 @@ var Scene = React.createClass({
         var toScene = {label: mappings[label] || ""};
 		var active = subscene && 
 			toScene.label == subscene.label ;
+		var chapter = this.props.chapter;
+		var view = this.props.view;
+		var href = 
+			view.urlfor.get('scene', chapter.label, toScene.label);
         return (
 			<SceneLink 
+				href={href}
+				toScene={toScene}
+				chapter={this.props.chapter}
 				onClick={this.subsceneHandler(toScene)}
 				active={active}>
 				{elem.text}
@@ -394,6 +407,9 @@ var Scene = React.createClass({
             }
 		}.bind(this);
 
+		var chapter = this.props.chapter;
+		var href = 
+			view.urlfor.get('scene', chapter.label, toScene.label);
         return (
             <span className="game-input">
                 <input 
@@ -401,6 +417,9 @@ var Scene = React.createClass({
                     defaultValue={value}
                     onKeyUp={onKeyUp} />
 				<SceneLink ref='link' 
+					href={href}
+					toScene={toScene}
+					chapter={this.props.chapter}
 					onClick={handler}
 					active={active}>
                     [{elem.buttonVal}]
@@ -680,7 +699,7 @@ function testHistory() {
 
 //testHistory();
 
-function ViewState(component, config, mode) {
+function ViewState(component, config, mode, paths) {
 	this.bindings = new Bindings();
 	this.component = component;
 	this.selectedScene = {};
@@ -688,6 +707,7 @@ function ViewState(component, config, mode) {
 	this.setConfigMode(mode);
 	this.showStorySettings = false;
 	this.chapterHist= new History(5, null);
+	this.urlfor = new UrlFor(paths);
 
 	this.config = _.extend({
 		scrollToView: true,
@@ -700,6 +720,7 @@ function ViewState(component, config, mode) {
 }
 
 ViewState.prototype = {
+
 	setConfigMode: function(mode) {
 		this.configMode = mode || _.identity;
 	},
@@ -818,10 +839,21 @@ ViewState.prototype = {
 }
 
 
+function UrlFor(paths) {
+	this.paths = paths || [];
+}
 
+UrlFor.prototype.get = function(name /*, args... */) {
+	var args = _.rest(arguments);
+	var url = this.paths[name];
+	if (!url)
+		return "";
 
-
-
+	var pat = /:\w+/;
+	return _.reduce(args, function(url, arg) {
+		return url.replace(pat, arg);
+	}, url);
+}
 
 
 

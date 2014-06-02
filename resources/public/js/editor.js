@@ -9,12 +9,19 @@ function sela(node, selector) {
 	return node.querySelectorAll(selector);
 }
 
+function selv(node, selector) {
+	var node = node.querySelector(selector);
+	if (node)
+		return node.value;
+}
+
 window.addEventListener("load", function() {
     var textarea = sel(document, "#create textarea");
 	var readOption = sel(document, "input[name=readingMode]");
 	var initialData = parseScript(textarea.value);
 
     var storyComponent = Story({ 
+		paths: getPaths(),
         data: initialData,
 		configMode: readOption.checked ? readingMode : null,
 		config: loadConfiguration(),
@@ -47,6 +54,13 @@ window.addEventListener("load", function() {
 	setupEditingOptions(storyComponent);
 });
 
+function getPaths() {
+	return {
+		chapter: selv(document, "#chapter-path"),
+		scene: selv(document, "#scene-path"),
+	}
+}
+	
 function getUploader() {
 	disableUpload = sel(document, "#disable-upload");
 	if (disableUpload && !disableUpload.value) {
