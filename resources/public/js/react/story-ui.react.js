@@ -66,16 +66,20 @@ var Story = React.createClass({displayName: 'Story',
 			return view.displaySettings(!view[name]);
 		}
 
-		var warnings = story.chapters.warnings;
-		warnings = _.map(warnings, function(msg) {
-			return React.DOM.p( {className:"error"}, React.DOM.em(null, msg));
-		});
+		var warnings;
+		if (story.chapters) {
+			warnings = story.chapters.warnings;
+			warnings = _.map(warnings, function(msg) {
+				return React.DOM.p( {className:"error"}, React.DOM.em(null, msg));
+			});
+		}
 
 		return (
 			React.DOM.div( {className:"story"}, 
 
 				React.DOM.h1( {className:"story-title"}, 
 					ChapterLink( {view:view, 
+						href:view.urlfor.get('story'),
 						active:!chapter, 
 						chapter:{}}, 
 						story.storyTitle
@@ -178,7 +182,7 @@ var ChapterLink = React.createClass({displayName: 'ChapterLink',
 		var chapter = this.props.chapter;
 		var className = cl({ active: this.props.active });
 		var handler = view.selectChapter.bind(view, chapter);
-		var href =
+		var href = this.props.href ||
 			view.urlfor.get('chapter', chapter.label);
 		return (
 			React.DOM.a( {className:className,
@@ -854,6 +858,4 @@ UrlFor.prototype.get = function(name /*, args... */) {
 		return url.replace(pat, arg);
 	}, url);
 }
-
-
 

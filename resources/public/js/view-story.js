@@ -18,6 +18,7 @@ window.addEventListener("load", function() {
 
 function getPaths() {
 	return {
+		story: selv(document, "#story-path"),
 		chapter: selv(document, "#chapter-path"),
 		scene: selv(document, "#scene-path"),
 	}

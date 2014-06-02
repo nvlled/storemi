@@ -138,12 +138,16 @@
 (defn create-paths [story]
   (let [id (:id story)
         username (:username story)]
-    {"chapter" (url/chapter id username)
-     "scene" (url/scene id username)}))
+    {"story" (url/story username id)
+     "chapter" (url/chapter username id)
+     "scene" (url/scene username id)}))
 
 (defn create-path-fields [story]
   (let [paths (create-paths story)]
     (list
+      (cmpt/hidden-field 
+        (paths "story")
+        :id "story-path")
       (cmpt/hidden-field 
         (paths "chapter")
         :id "chapter-path")

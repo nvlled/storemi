@@ -66,16 +66,20 @@ var Story = React.createClass({
 			return view.displaySettings(!view[name]);
 		}
 
-		var warnings = story.chapters.warnings;
-		warnings = _.map(warnings, function(msg) {
-			return <p className='error'><em>{msg}</em></p>;
-		});
+		var warnings;
+		if (story.chapters) {
+			warnings = story.chapters.warnings;
+			warnings = _.map(warnings, function(msg) {
+				return <p className='error'><em>{msg}</em></p>;
+			});
+		}
 
 		return (
 			<div className='story'>
 
 				<h1 className='story-title'>
 					<ChapterLink view={view} 
+						href={view.urlfor.get('story')}
 						active={!chapter} 
 						chapter={{}}>
 						{story.storyTitle}
@@ -178,7 +182,7 @@ var ChapterLink = React.createClass({
 		var chapter = this.props.chapter;
 		var className = cl({ active: this.props.active });
 		var handler = view.selectChapter.bind(view, chapter);
-		var href =
+		var href = this.props.href ||
 			view.urlfor.get('chapter', chapter.label);
 		return (
 			<a className={className}
@@ -854,6 +858,4 @@ UrlFor.prototype.get = function(name /*, args... */) {
 		return url.replace(pat, arg);
 	}, url);
 }
-
-
 
