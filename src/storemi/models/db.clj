@@ -1,5 +1,6 @@
 (ns storemi.models.db
   (:require 
+    [clj-rhino :as js]
     [clojure.walk :refer [keywordize-keys]]
     [storemi.settings :as settings]
     [clojure.java.jdbc :as sql]

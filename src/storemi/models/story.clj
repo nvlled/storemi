@@ -1,5 +1,7 @@
 (ns storemi.models.story
   (:require 
+    [clj-rhino :as js]
+    [clojure.walk :refer [keywordize-keys]]
     [hiccup.util :refer [escape-html]]
     [clj-http.client :as client]
     [clojure.java.jdbc :as sql]
@@ -68,7 +70,7 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
 
 (defn render-template [& [title synopsis]]
   (format script-template
-    title synopsis))
+    title (or "this is the synopsis")))
 
 (defn create-story-table []
   (db/dbdo
@@ -95,14 +97,17 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
            :synopsis  (escape-html synopsis)})]
     (first response)))
 
+(def parser-scope 
+  (doto (js/new-safe-scope)
+    (js/eval (slurp "resources/public/js/underscore-min.js"))
+    (js/eval (slurp "resources/public/js/parser.js"))))
+
 (defn parse-script [script]
-  (try
-    (let [response 
-          (client/post "http://localhost:3030/parse-script" 
-                       {:body script})]
-      (-> (:body response)
-          db/json-parse))
-    (catch java.net.ConnectException e nil))) 
+  (let [sc (js/new-scope nil parser-scope)]
+    (js/set! sc "script" script)
+    (-> (js/eval sc "parseScript(script)")
+        js/from-js
+        keywordize-keys)))
 
 (defn create-story [creator title &[synopsis]]
   (let [script (render-template title (or synopsis))
@@ -212,6 +217,9 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
 (defn from-request [{params :params}]
   (select-keys 
     params [:id :username :title :body :script :synopsis :data]))
+
+
+
 
 
 
