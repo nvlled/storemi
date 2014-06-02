@@ -4,8 +4,12 @@
     [storemi.settings :as settings]
     [storemi.urlfor :as urlfor]))
 
-(defn hidden-field [name val]
-  (let [props {:type "hidden" :name name :value (or val "")}]
+(defn hidden-field [val & {:keys [name id class]}]
+  (let [props {:type "hidden" 
+               :name name 
+               :value (or val "")
+               :id id
+               :class class}]
     [:input props]))
 
 (defn story-list

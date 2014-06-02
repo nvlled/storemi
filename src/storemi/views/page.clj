@@ -143,22 +143,15 @@
       request
       :body
       [:div
-       [:input {:id "edit-url"
-                :type :hidden
-                :value 
-                (when owned (url/story-edit username (:id story)))}]
-       [:input {:id "data-path"
-                :type :hidden
-                :value 
-                (url/story-data
-                  (:username params)
-                  (:story-id params))}]
-       [:textarea {:id "story-script"
-                   :type :hidden}
-        (:script story)]
+       (cmpt/hidden-field
+         (when owned (url/story-edit username (:id story)))
+         :id "edit-url")
+       (cmpt/hidden-field
+         (url/story-data (:username story) (:id story))
+         :id "data-path")
+       [:textarea {:id "story-script"} (:script story)]
        [:div#contents
-        (js/render-story-component (:data story))
-        ]]
+        (js/render-story-component (:data story))]]
       :scripts ["/js/react.min.js"
                 "/js/parser.js"
                 "/js/react/story-ui.react.js"
@@ -187,9 +180,8 @@
       request
       :body
       [:div
-       [:input {:id "my-username"
-                :type :hidden
-                :value (session/username request)}]
+       (cmpt/hidden-field (session/username request)
+         :id "my-username")
        [:div.editor
         (cmpt/story-editor story)
         [:div {:id "view"} (js/render-story-component (:data story))]]]
