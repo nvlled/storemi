@@ -1,4 +1,5 @@
 
+- factor out common js code on site.js
 - Show (error) messages when scene is not found
 - Show (error) messages when a label has been duplicated
 - Autogenerate script labels

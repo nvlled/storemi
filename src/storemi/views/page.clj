@@ -135,6 +135,26 @@
            [:h2 param-user]
            (cmpt/story-list (st/user-stories param-user) true)))])))
 
+(defn create-paths [story]
+  (let [id (:id story)
+        username (:username story)]
+    {"chapter" (url/chapter id username)
+     "scene" (url/scene id username)}))
+
+(defn create-path-fields [story]
+  (let [paths (create-paths story)]
+    (list
+      (cmpt/hidden-field 
+        (paths "chapter")
+        :id "chapter-path")
+      (cmpt/hidden-field  
+        (paths "scene")
+        :id "scene-path"))))
+
+(defn render-story-component [story]
+  (js/render-story-component (:data story) 
+                             (create-paths story)))
+
 (defn story [{params :params :as request}]
   (let [story (st/story-match request)
         username (session/username request)
@@ -143,6 +163,7 @@
       request
       :body
       [:div
+       (create-path-fields story)
        (cmpt/hidden-field
          (when owned (url/story-edit username (:id story)))
          :id "edit-url")
@@ -150,8 +171,7 @@
          (url/story-data (:username story) (:id story))
          :id "data-path")
        [:textarea {:id "story-script"} (:script story)]
-       [:div#contents
-        (js/render-story-component (:data story))]]
+       [:div#contents (render-story-component story)]]
       :scripts ["/js/react.min.js"
                 "/js/parser.js"
                 "/js/react/story-ui.react.js"
@@ -175,16 +195,22 @@
          "[cancel]"]]])))
 
 (defn story-edit [{errors :errors :as request}]
-  (let [story (st/story-match-by request)]
+  (let [story (st/story-match-by request)
+        id (:id story)
+        username (:username story)]
     (layout/common
       request
       :body
       [:div
+       (create-path-fields story)
+       (cmpt/hidden-field 
+         (session/username request)
+         :id "my-username")
        (cmpt/hidden-field (session/username request)
          :id "my-username")
        [:div.editor
         (cmpt/story-editor story)
-        [:div {:id "view"} (js/render-story-component (:data story))]]]
+        [:div {:id "view"} (render-story-component story)]]]
       :scripts ["/js/react.min.js"
                 "/js/parser.js"
                 "/js/react/story-ui.react.js"
