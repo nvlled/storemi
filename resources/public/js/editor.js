@@ -1,19 +1,10 @@
 
-function sel(node, selector) {
-	console.assert(node);
-	return node.querySelector(selector);
-}
+(function(root) {
 
-function sela(node, selector) {
-	console.assert(node);
-	return node.querySelectorAll(selector);
-}
-
-function selv(node, selector) {
-	var node = node.querySelector(selector);
-	if (node)
-		return node.value;
-}
+var sel = storemi.sel;
+var sela = storemi.sela;
+var getPaths = storemi.getPaths;
+var readingMode = storemi.readingMode;
 
 window.addEventListener("load", function() {
     var textarea = sel(document, "#create textarea");
@@ -54,10 +45,6 @@ window.addEventListener("load", function() {
 	setupEditingOptions(storyComponent);
 });
 
-function getPaths() {
-	return JSON.parse(selv(document, "#paths"));
-}
-	
 function getUploader() {
 	disableUpload = sel(document, "#disable-upload");
 	if (disableUpload && !disableUpload.value) {
@@ -216,8 +203,4 @@ function bind(obj, fnname) {
 
 
 
-
-
-
-
-
+})(this);

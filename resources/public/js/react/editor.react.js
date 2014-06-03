@@ -1,6 +1,11 @@
 /** @jsx React.DOM */
 
-var ImagePanel = React.createClass({displayName: 'ImagePanel',
+(function(root) {
+
+var cl = storemi.cl;
+var renderIf = storemi.renderIf;
+
+var ImagePanel = root.ImagePanel = React.createClass({displayName: 'ImagePanel',
 
     getInitialState: function() {
 		return {
@@ -290,5 +295,5 @@ var ImageAddByURL = React.createClass({displayName: 'ImageAddByURL',
 
 
 
-
+})(this);
 

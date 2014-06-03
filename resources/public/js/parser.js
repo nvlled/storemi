@@ -15,6 +15,7 @@ function requireAs(libpath, varname) {
 }
 
 var _ = requireAs("underscore", "_");
+var startsWith = storemi.startsWith;
 
 var MARKER = {
     LINK:       "#",
@@ -537,38 +538,6 @@ function buildPattern() {
 		].join(""));
     });
     return new RegExp("("+patterns.join("|")+")");
-}
-
-function randSelect(coll) {
-    return coll[Math.floor(Math.random()*coll.length)];
-}
-
-function randomString() {
-    var s = Math.random().toString(36);
-    return s.slice(2, 3+Math.random()*s.length);
-}
-
-function intercalate(xs, e) {
-    if (xs.length == 1)
-        return xs;
-
-    if (typeof e !== "function")
-        e = _.constant(e);
-
-    var ys = [];
-    ys.push(xs[0]);
-    for (var i = 1; i < xs.length; i++) {
-        ys.push(e());
-        ys.push(xs[i]);
-    }
-    return ys;
-}
-
-function startsWith(s, prefix) {
-    var i = 0;
-    while (s[i] && s[i] == prefix[i])
-        i++;
-    return prefix[i] == null;
 }
 
 root || (root = {});
