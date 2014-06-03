@@ -55,11 +55,7 @@ window.addEventListener("load", function() {
 });
 
 function getPaths() {
-	return {
-		story: selv(document, "#story-path"),
-		chapter: selv(document, "#chapter-path"),
-		scene: selv(document, "#scene-path"),
-	}
+	return JSON.parse(selv(document, "#paths"));
 }
 	
 function getUploader() {

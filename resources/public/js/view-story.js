@@ -1,13 +1,11 @@
 
 window.addEventListener("load", function() {
-	var script = document.querySelector("#story-script").value;
-	var data = parseScript(script);
+	var data = JSON.parse(selv(document, "#story-script"));
 
 	var storyComponent = Story({ 
 		paths: getPaths(),
-		data: parseScript(script),
+		data: data,
 		configMode: readingMode,
-		editURL: document.querySelector("#edit-url").value,
 	});
 
 	React.renderComponent(
@@ -17,11 +15,7 @@ window.addEventListener("load", function() {
 });
 
 function getPaths() {
-	return {
-		story: selv(document, "#story-path"),
-		chapter: selv(document, "#chapter-path"),
-		scene: selv(document, "#scene-path"),
-	}
+	return JSON.parse(selv(document, "#paths"));
 }
 
 function sel(node, selector) {
