@@ -37,6 +37,7 @@
         (list 
           (when logged-in
             [:span username " -> "])
+          (cmpt/hidden-field username :id "my-username")
           (cmpt/main-nav username)))
       (cmpt/notification 
         (session/get-notification req))

@@ -3,6 +3,7 @@
     [ring.util.response :as ring]
     [storemi.session :as session]  
     [storemi.models.story :as st]
+    [storemi.models.db :as db]
     [storemi.views.component :as cmpt]
     [storemi.views.layout :as layout]
     [storemi.urlfor :as url]
@@ -135,51 +136,69 @@
            [:h2 param-user]
            (cmpt/story-list (st/user-stories param-user) true)))])))
 
-(defn create-paths [story]
+(defn create-paths [req story]
   (let [id (:id story)
-        username (:username story)]
-    {"story" (url/story username id)
-     "chapter" (url/chapter username id)
-     "scene" (url/scene username id)}))
+        author (:username story)]
+    {"story"    (url/story author id)
+     "chapter"  (url/chapter author id)
+     "scene"    (url/scene author id)
+     "edit-story"
+     (when (= (session/username req) author)
+       (url/story-edit author id))}))
 
-(defn create-path-fields [story]
-  (let [paths (create-paths story)]
-    (list
-      (cmpt/hidden-field 
-        (paths "story")
-        :id "story-path")
-      (cmpt/hidden-field 
-        (paths "chapter")
-        :id "chapter-path")
-      (cmpt/hidden-field  
-        (paths "scene")
-        :id "scene-path"))))
+(defn create-path-fields [paths]
+  (cmpt/json-field paths :id "paths"))
 
-(defn render-story-component [story]
-  (js/render-story-component (:data story) 
-                             (create-paths story)))
+(defn render-story-component [story paths]
+  (js/render-story-component (:data story) paths)) 
+
+(defn insert-data [story new-data]
+  (update-in story
+             [:data]
+             (fn [old-data] (merge old-data new-data))))
+
+(defn story-component [{params :params :as request}
+                       story
+                       & {:keys [id class]}]
+  (let [ids (select-keys params [:chapter-id :scene-id])
+        story (insert-data 
+                (st/story-match request) ids)
+        paths (create-paths request story)]
+    [:div 
+     (cmpt/json-field ids :id "story-ids")
+     (create-path-fields paths)
+     [:textarea {:id "story-script"} 
+      (db/json-string (:data story))]
+     [:div {:id id :class class}
+      (js/render-story-component (:data story) paths)]]))
 
 (defn story [{params :params :as request}]
-  (let [story (st/story-match request)
-        username (session/username request)
-        owned (= username (:username story))]
+  (layout/common
+    request
+    :body
+    (story-component 
+      request 
+      (st/story-match request)
+      :id "contents")
+    :scripts ["/js/react.min.js"
+              "/js/parser.js"
+              "/js/react/story-ui.react.js"
+              "/js/view-story.js"]))
+
+(defn story-edit [{errors :errors :as request}]
+  (let [story (st/story-match-by request)]
     (layout/common
       request
       :body
-      [:div
-       (create-path-fields story)
-       (cmpt/hidden-field
-         (when owned (url/story-edit username (:id story)))
-         :id "edit-url")
-       (cmpt/hidden-field
-         (url/story-data (:username story) (:id story))
-         :id "data-path")
-       [:textarea {:id "story-script"} (:script story)]
-       [:div#contents (render-story-component story)]]
+      [:div.editor
+       (cmpt/story-editor story)
+       (story-component request story :id "view")]
       :scripts ["/js/react.min.js"
                 "/js/parser.js"
                 "/js/react/story-ui.react.js"
-                "/js/view-story.js"])))
+                "/js/react/editor.react.js"
+                "/js/editor.js"]
+      :styles ["/css/editor.css"])))
 
 (defn story-delete [request]
   (let [story (st/story-match-by request)]
@@ -197,33 +216,6 @@
         [:a {:href (url/user-index (session/username request)
                                    (:id story))}
          "[cancel]"]]])))
-
-(defn story-edit [{errors :errors :as request}]
-  (let [story (st/story-match-by request)
-        id (:id story)
-        username (:username story)]
-    (layout/common
-      request
-      :body
-      [:div
-       (create-path-fields story)
-       (cmpt/hidden-field 
-         (session/username request)
-         :id "my-username")
-       (cmpt/hidden-field (session/username request)
-         :id "my-username")
-       [:div.editor
-        (cmpt/story-editor story)
-        [:div {:id "view"} (render-story-component story)]]]
-      :scripts ["/js/react.min.js"
-                "/js/parser.js"
-                "/js/react/story-ui.react.js"
-                "/js/react/editor.react.js"
-                "/js/editor.js"]
-      :styles ["/css/editor.css"])))
-
-
-
 
 
 
