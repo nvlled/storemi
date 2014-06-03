@@ -1,5 +1,15 @@
 (ns storemi.common)
 
+(defn resource [path]
+  (let [file (clojure.java.io/file (str "resources/" path))]
+    (if (.exists file)
+      file
+      (clojure.java.io/resource path))))
+
+(defn read-resource [path]
+  (when-let [file (resource path)]
+    (slurp file)))
+
 (defn read-int [n defval]
   (try
     (if (integer? n)

@@ -14,7 +14,7 @@
   ["/css/screen.css"])
 
 (def image-directory
-  "resources/public/images")
+  "public/images")
 
 (def credentials-file "credentials.clj")
 

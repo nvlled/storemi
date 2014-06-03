@@ -2,6 +2,7 @@
   (:require 
     [clj-rhino :as js]
     [clojure.walk :refer [keywordize-keys]]
+    [storemi.common :refer [read-resource]]
     [storemi.settings :as settings]
     [clojure.java.jdbc :as sql]
     [cheshire.core :as json]))
@@ -12,14 +13,13 @@
         read-string
         eval
         :db)
-    (catch java.io.FileNotFoundException e )))
+    (catch Exception e)))
 
 (def db
   (or (System/getenv "DATABASE_URL")
       (merge
         settings/default-db
         (read-credentials))))
-
 
 (def known-tables
   ["stories" "users"])

@@ -11,8 +11,6 @@
   (let [port (if port (Integer. port) default-port)]
     (init)
     (ring/run-jetty 
-      (-> app
-          (wrap-file "resources")
-          wrap-file-info)
+      (-> app)
       {:port port
        :join false})))
