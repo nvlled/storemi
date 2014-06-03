@@ -129,8 +129,12 @@
          (story-data request))  
 
     (GET url/story-path request
-         (coerce enforce-user-story page/story)
-         )))
+         (coerce enforce-user-story page/story))
+    (GET url/chapter-path request
+         (coerce enforce-user-story page/story))
+    (GET url/scene-path request
+         (coerce enforce-user-story page/story))
+    ))
 
 
 
