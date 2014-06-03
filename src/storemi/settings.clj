@@ -7,7 +7,7 @@
 
 (def site-scripts
   ["/js/underscore-min.js"
-   ;"/js/site.js"
+   "/js/site.js"
    ])
 
 (def site-styles

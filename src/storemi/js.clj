@@ -2,12 +2,23 @@
   (:require 
     [clj-rhino :as js]
     [clojure.walk :refer [keywordize-keys]]
+    [clojure.java.io :as io]
+    [storemi.settings :refer [site-scripts]]
     [storemi.common :refer [read-resource]]))
 
+(def common-scripts
+  ["public/js/underscore-min.js"
+   "public/js/site.js"])
+
+(defn with-common [& scripts]
+  (concat common-scripts scripts))
+
 (def parser-scope 
-  (doto (js/new-safe-scope)
-    (js/eval (read-resource "public/js/underscore-min.js"))
-    (js/eval (read-resource "public/js/parser.js"))))
+  (let [scope (js/new-safe-scope)
+        scripts
+        (with-common "public/js/parser.js")]
+    (doseq [s scripts]
+      (js/eval scope (read-resource s)))))
 
 (defn parse-script [script]
   (let [sc (js/new-scope nil parser-scope)]
@@ -16,10 +27,9 @@
         js/from-js)))
 
 (def react-scope
-  (let [scripts ["public/js/underscore-min.js"
-                 "public/js/react.min.js"
-                 "public/js/parser.js"
-                 "public/js/react/story-ui.react.js"]
+  (let [scripts (with-common 
+                  "public/js/react.min.js"
+                  "public/js/react/story-ui.react.js")
         scope (js/new-scope)]
     (js/eval scope "var global = this")
     (doseq [s scripts]
@@ -33,7 +43,7 @@
     (js/eval
       sc "React.renderComponentToString(
             Story({data: data, 
-                   configMode: readingMode,
+                   configMode: storemi.readingMode,
                    paths: paths}))")))
 
 

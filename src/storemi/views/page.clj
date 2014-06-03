@@ -181,7 +181,6 @@
       (st/story-match request)
       :id "contents")
     :scripts ["/js/react.min.js"
-              "/js/parser.js"
               "/js/react/story-ui.react.js"
               "/js/view-story.js"]))
 
