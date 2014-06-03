@@ -116,17 +116,6 @@ function persistMappings(mappings) {
 	localStorage[lcMappingKey] = JSON.stringify(mappings);
 }
 
-function readingMode(config) {
-	var storyComponent = this;
-	var hideChIndex = !storyComponent.atHome() 
-	return _.extend(config, {
-		hideSceneIndex: true,
-		hideSynopsis: false,
-		hideChapterIndex: hideChIndex,
-		hideWarnings: true,
-	});
-}
-
 function loadConfiguration() {
 	var inputs = sela(document, ".settings input");
 	return _.reduce(inputs, function(result, input) {

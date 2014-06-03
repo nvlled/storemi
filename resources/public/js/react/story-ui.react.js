@@ -887,3 +887,14 @@ UrlFor.prototype.get = function(name /*, args... */) {
 	}, url);
 }
 
+function readingMode(config) {
+	var storyComponent = this;
+	var hideChIndex = !storyComponent.atHome() 
+	return _.extend(config, {
+		hideSceneIndex: true,
+		hideSynopsis: false,
+		hideChapterIndex: hideChIndex,
+		hideWarnings: true,
+	});
+}
+

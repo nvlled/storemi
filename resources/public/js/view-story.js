@@ -45,15 +45,6 @@ function fetchStoryData(url, fn) {
 	}
 }
 
-function readingMode(config) {
-	var storyComponent = this;
-	var hideChIndex = !storyComponent.atHome() 
-	return _.extend(config, {
-		hideSceneIndex: true,
-		hideSynopsis: false,
-		hideChapterIndex: hideChIndex,
-	});
-}
 
 
 

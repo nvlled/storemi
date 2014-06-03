@@ -32,7 +32,10 @@
     (js/eval
       sc "React.renderComponentToString(
             Story({data: data, 
+                   configMode: readingMode,
                    paths: paths}))")))
+
+
 
 
 
