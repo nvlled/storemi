@@ -25,13 +25,14 @@
       (js/eval scope (slurp s)))
     scope))
 
-(defn render-story-component [data & [paths]]
+(defn render-story-component [data paths]
   (let [sc (js/new-scope nil react-scope)]
     (js/set! sc "data" (js/to-js data sc))
     (js/set! sc "paths" (js/to-js paths sc))
     (js/eval
       sc "React.renderComponentToString(
-            Story({data: data, paths: paths}))")))
+            Story({data: data, 
+                   paths: paths}))")))
 
 
 
