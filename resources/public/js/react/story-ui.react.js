@@ -3,17 +3,22 @@
 var Story = React.createClass({displayName: 'Story',
 
     getInitialState: function() {
-		var paths = this.props.paths;
-		var config = this.props.config;
-		var configMode = this.props.configMode;
+		var data = this.props.data;
 		return {
-			data: this.props.data,
-			view: new ViewState(this, config, configMode, paths),
+			data: data,
+			view: new ViewState(this, {
+				paths: this.props.paths,
+				config: this.props.config,
+				configMode: this.props.configMode,
+				chapterId: data["chapter-id"],
+				sceneId: data["scene-id"],
+			}),
 		}
 	},
 
 	redraw: function(view) {
-		this.setState({view: view});
+		if (this.isMounted())
+			this.setState({view: view});
 	},
 
 	getViewState: function() {
@@ -45,6 +50,7 @@ var Story = React.createClass({displayName: 'Story',
 		var view = this.state.view;
 
 		var chapter = view.getSelectedChapter(story.chapters);
+
 		var chapterComponent;
 		if (chapter) {
 			chapterComponent = 
@@ -73,10 +79,10 @@ var Story = React.createClass({displayName: 'Story',
 				return React.DOM.p( {className:"error"}, React.DOM.em(null, msg));
 			});
 		}
+		var editURL = view.urlfor.get('edit-story');
 
 		return (
 			React.DOM.div( {className:"story"}, 
-
 				React.DOM.h1( {className:"story-title"}, 
 					ChapterLink( {view:view, 
 						href:view.urlfor.get('story'),
@@ -84,9 +90,9 @@ var Story = React.createClass({displayName: 'Story',
 						chapter:{}}, 
 						story.storyTitle
 					),
-					renderIf(this.props.editURL)(
+					renderIf(editURL)(
 					React.DOM.a( {className:"story-settings", 
-						href:this.props.editURL}, 
+						href:editURL}, 
 						"[edit]"
 					)),
 					React.DOM.a( {className:"story-settings", 
@@ -263,7 +269,7 @@ var Chapter = React.createClass({displayName: 'Chapter',
 		var view = this.props.view;
 
 		var scene = view.getSelectedScene(chapter);
-		//scene || (scene = _.first(chapter.scenes));
+		scene || (scene = _.first(chapter.scenes));
 
 		var sceneComponent;
 		if (scene) sceneComponent = 
@@ -703,15 +709,15 @@ function testHistory() {
 
 //testHistory();
 
-function ViewState(component, config, mode, paths) {
+function ViewState(component, opts) {
 	this.bindings = new Bindings();
 	this.component = component;
 	this.selectedScene = {};
 	this.subscenes = {};
-	this.setConfigMode(mode);
+	this.setConfigMode(opts.configMode);
 	this.showStorySettings = false;
 	this.chapterHist= new History(5, null);
-	this.urlfor = new UrlFor(paths);
+	this.urlfor = new UrlFor(opts.paths);
 
 	this.config = _.extend({
 		scrollToView: true,
@@ -719,8 +725,13 @@ function ViewState(component, config, mode, paths) {
 		hideSceneIndex: false,
 		hideChapterIndex: false,
 		hideSynopsis: false,
-	}, config);
+	}, opts.config);
 	this.config = this.configMode(this.config);
+
+	var ch = {label: opts.chapterId};
+	var sc = {label: opts.sceneId};
+	this.selectChapter(ch);
+	this.selectScene(ch, sc);
 }
 
 ViewState.prototype = {
@@ -770,7 +781,7 @@ ViewState.prototype = {
 		return this.chapterHist.hasNext();
 	},
 
-	selectChapter: function(chapter) {
+	setChapter: function(chapter) {
 		var hist = this.chapterHist;
 		if (!chapter.label)
 			hist.goHome();
@@ -780,6 +791,11 @@ ViewState.prototype = {
 					return a.label == b.label;
 				return a == b;
 			});
+	},
+
+	selectChapter: function(chapter) {
+		this.setScene(chapter, _.first(chapter.scenes));
+		this.setChapter(chapter);
 		return this.update(Chapter.selector(chapter));
 	},
 
@@ -792,9 +808,13 @@ ViewState.prototype = {
 		}
 	},
 
-	selectScene: function(chapter, scene) {
+	setScene: function(chapter, scene) {
 		this._clearSubscene(chapter, scene);
 		this.selectedScene[chapter.label] = scene;
+	},
+
+	selectScene: function(chapter, scene) {
+		this.setScene(chapter, scene);
 		return this.update(Scene.selector(scene));
 	},
 
@@ -835,6 +855,8 @@ ViewState.prototype = {
 
 	_clearSubscene: function(chapter, scene) {
 		if (!this.config.rememberSubscenes) {
+			if (!scene)
+				scene = this.selectedScene[chapter.label];
 			if (scene)
 				this.subscene(chapter)[scene.label] = null;
 		}
@@ -853,7 +875,7 @@ UrlFor.prototype.get = function(name /*, args... */) {
 	if (!url)
 		return "";
 
-	var pat = /:\w+/;
+	var pat = /:[a-zA-Z0-9-]+/;
 	return _.reduce(args, function(url, arg) {
 		return url.replace(pat, arg);
 	}, url);
