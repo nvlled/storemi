@@ -1,6 +1,7 @@
 (ns storemi.views.component
   (:require 
     [hiccup.page :refer [html5 include-css]]
+    [storemi.models.db :refer [json-string]]
     [storemi.settings :as settings]
     [storemi.urlfor :as urlfor]))
 
@@ -11,6 +12,13 @@
                :id id
                :class class}]
     [:input props]))
+
+(defn json-field [data & {:keys [id name class]}]
+  (hidden-field
+    (json-string data)
+    :id id
+    :name name
+    :class class))
 
 (defn story-list
   [stories & [hide-author]]
