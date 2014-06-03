@@ -373,9 +373,11 @@ var Scene = React.createClass({
     createChapterLink: function(elem, mappings) {
         var label = elem.label;
         var toChapter = {label: mappings[label] || "nope"};
+		var href = 
+			this.props.view.urlfor('chapter', toChapter.label);
         return (
             <a className='chapter-link'
-                href='x' 
+                href={href}
                 onClick={this.chapterHandler(toChapter)}>
                 {elem.text}
             </a>
