@@ -14,7 +14,7 @@
   ["/css/screen.css"])
 
 (def image-directory
-  "public/images")
+  "resources/public/images")
 
 (def credentials-file "credentials.clj")
 
@@ -25,3 +25,6 @@
    :subname "//127.0.0.1:5432/somedb"
    :user "USERNAME"
    :password "PASSWORD"})
+
+
+
