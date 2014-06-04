@@ -185,12 +185,16 @@
               "/js/view-story.js"]))
 
 (defn story-edit [{errors :errors :as request}]
-  (let [story (st/story-match-by request)]
+  (let [script (get-in request [:params :script])
+        story (st/story-match-by request)]
     (layout/common
       request
       :body
       [:div.editor
-       (cmpt/story-editor story)
+       (when errors
+         [:p.error "Save failed: " (:error errors)]
+         )
+       (cmpt/story-editor story script)
        (story-component request story :id "view")]
       :scripts ["/js/react.min.js"
                 "/js/parser.js"
@@ -216,4 +220,39 @@
                                    (:id story))}
          "[cancel]"]]])))
 
+(defn story-table [stories]
+  [:table.stories
+   [:thead
+    [:tr
+     [:td "author"]
+     [:td "title"]
+     [:td "synopsis"] ]
+    ]
+   [:tbody
+    (for [story stories]
+      [:tr
+       [:td (:username story)]
+       [:td (:title story)]
+       [:td (:synopsis story)] ])]])
+
+(defn browse [request]
+  (let [stories (st/recent-stories)]
+    (layout/common
+      request
+      :styles ["/css/browse.css"]
+      :body
+      [:div
+       [:h1 "Browse crappy stories"]
+       [:form {:class "search-form"}
+        [:p "Search: "
+         [:input {:name "title-query"}]
+         [:input {:type :submit :value "search"}]
+         [:label
+          [:input {:type :radio :name "basis"}]
+          "title"]
+         [:label
+          [:input {:type :radio :name "basis"}]
+          "synopsis"]]]
+       [:hr]
+       (story-table stories)])))
 

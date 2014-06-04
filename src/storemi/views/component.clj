@@ -87,7 +87,8 @@
      (list
        [:a {:href (urlfor/login)} "login"]
        [:a {:href (urlfor/register)} "register"]))
-   [:a {:href (urlfor/about)} "about"]])
+   [:a {:href (urlfor/about)} "about"]
+   [:a {:href (urlfor/browse)} "browse"]])
 
 (defn story-creator [{errors :errors :as req}]
   [:form.story-creator
@@ -134,7 +135,7 @@
    [:input {:name "save" :type :submit :value "Save"}]
    [:input {:name "saview" :type :submit :value "Save and view"}]])
 
-(defn story-editor [story]
+(defn story-editor [story & [script]]
   [:div {:id "create"}
    [:input {:id "disable-upload" 
             :type :hidden
@@ -144,7 +145,7 @@
            :method "POST"}
     [:input {:name "storyTitle" :type :hidden }]
     [:input {:name "synopsis" :type :hidden }]
-    [:textarea {:name "script"} (:script story)]
+    [:textarea {:name "script"} (or script (:script story))]
     (edit-button-panel story)
     [:div#images]
     (editing-options)]]

@@ -17,6 +17,7 @@
 (def ns-routes 
   ["storemi.routes.upload"  
    "storemi.routes.home"  
+   "storemi.routes.browse"  
    "storemi.routes.register"
    "storemi.routes.login"
    "storemi.routes.logout"
@@ -77,7 +78,4 @@
       (handler/site {:session {:store (make-store)}})
       ignore-trailing-slash
       (wrap-base-url)))
-
-
-
 

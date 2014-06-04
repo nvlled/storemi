@@ -6,6 +6,7 @@
 (defurl logout "/logout")
 (defurl register "/register")
 (defurl about "/about")
+(defurl browse "/browse")
 
 (defurl upload-image "/upload")
 (defurl list-images "/images/:username")
