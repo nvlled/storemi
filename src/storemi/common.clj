@@ -1,14 +1,24 @@
-(ns storemi.common)
+(ns storemi.common
+  (:require
+    [clojure.java.io :as io]))
 
 (defn resource [path]
-  (let [file (clojure.java.io/file (str "resources/" path))]
+  (let [file (io/file (str "resources/" path))]
     (if (.exists file)
       file
-      (clojure.java.io/resource path))))
+      (io/resource path))))
+
+(defn with-resource [path f]
+  (let [file (io/file (str "resources/" path))
+        file (if (.exists file)
+               file
+               (io/resource path))]
+    (when file
+      (with-open [res (io/reader file)]
+        (f res)))))
 
 (defn read-resource [path]
-  (when-let [file (resource path)]
-    (slurp file)))
+  (with-resource path #(slurp %)))
 
 (defn read-int [n defval]
   (try
