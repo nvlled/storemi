@@ -6,17 +6,22 @@
     [storemi.settings :refer [site-scripts]]
     [storemi.common :refer [read-resource]]))
 
+(def script-dir "public/js/")
+
+(defn with-base [path]
+  (str script-dir path))
+
 (def common-scripts
-  ["public/js/underscore-min.js"
-   "public/js/site.js"])
+  ["underscore-min.js"
+   "site.js"])
 
 (defn with-common [& scripts]
-  (concat common-scripts scripts))
+  (map with-base
+       (concat common-scripts scripts)))
 
 (def parser-scope 
   (let [scope (js/new-safe-scope)
-        scripts
-        (with-common "public/js/parser.js")]
+        scripts (with-common "parser.js")]
     (doseq [s scripts]
       (js/eval scope (read-resource s)))))
 
@@ -28,8 +33,8 @@
 
 (def react-scope
   (let [scripts (with-common 
-                  "public/js/react.min.js"
-                  "public/js/react/story-ui.react.js")
+                  "react.min.js"
+                  "react/story-ui.react.js")
         scope (js/new-scope)]
     (js/eval scope "var global = this")
     (doseq [s scripts]
