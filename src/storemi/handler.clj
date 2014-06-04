@@ -11,6 +11,7 @@
     [storemi.models.db :as db]
     [storemi.models.user :refer [create-user-table]]
     [storemi.models.story :refer [create-story-table]]
+    [storemi.js :refer [start-script-watch]]
     ))
 
 (def ns-routes 
@@ -43,6 +44,7 @@
 (defn init []
   (println "storemi is starting") 
   (db/test-connection)
+  (start-script-watch)
   (when-not (db/tables-initialized?)
     (create-user-table)
     (create-story-table)))
