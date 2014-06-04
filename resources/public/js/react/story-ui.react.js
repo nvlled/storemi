@@ -200,7 +200,7 @@ var ChapterLink = React.createClass({displayName: 'ChapterLink',
 		var className = cl({ active: this.props.active });
 		var handler = view.selectChapter.bind(view, chapter);
 		var href = this.props.href ||
-			view.urlfor('chapter', chapter.label);
+			view.urlfor('chapter', chapter && chapter.label);
 		return (
 			React.DOM.a( {className:className,
 				href:href,
