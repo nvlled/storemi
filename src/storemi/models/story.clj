@@ -122,16 +122,14 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
     (= (:username data) username)))
 
 (defn update-story [id data script]
-  (let [parsed-data (js/parse-script script)
-        data (merge data parsed-data)]
-    (db/update!
-      :stories
-      (db/remove-nil 
-        {:title (get data :storyTitle)
-         :synopsis (get data :synopsis)
-         :data (db/json-string data)
-         :script script})
-      ["id = ?" (com/read-int id -1)])))
+  (db/update!
+    :stories
+    (db/remove-nil 
+      {:title (get data :storyTitle)
+       :synopsis (get data :synopsis)
+       :data (db/json-string data)
+       :script script})
+    ["id = ?" (com/read-int id -1)]))
 
 (defn get-story [id]
   (let [result 
