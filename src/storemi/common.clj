@@ -81,3 +81,20 @@
 
 (defn has-trailing [s]
   (= (peek (vec s)) \/))
+
+(defn unix-time []
+  (.getTime (java.util.Date.)))
+
+(defn throttle [f millis]
+  (let [expr (atom (future))]
+    (fn [& args]
+      (future-cancel @expr)
+      (reset!
+        expr
+        (future (Thread/sleep millis) (apply f args))))))
+
+
+
+
+
+
