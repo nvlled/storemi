@@ -40,14 +40,6 @@ function parseScript(scripts) {
     var index = 0;
 
     var titleIndex = getTitleIndex(index, lines);
-    if (titleIndex < 0) {
-        return {
-            storyTitle: "",
-            synopsis: "",
-            chapters: [],
-            error: "Story title not found"
-        };
-    }
 
     return {
         storyTitle: trimMarker(lines[titleIndex]).trim(),
