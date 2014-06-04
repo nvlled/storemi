@@ -69,18 +69,25 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
 # sample: /site-images/sample-a.png
   ")
 
+(def username-maxlen 20)
+(def title-maxlen 70)
+(def synopsis-maxlen 200)
+
 (defn render-template [& [title synopsis]]
   (format script-template
     title (or "this is the synopsis")))
+
+(defn varchar [size]
+  (str "varchar(" size ")"))
 
 (defn create-story-table []
   (db/dbdo
     (sql/create-table-ddl
       :stories
       [:id "serial" "PRIMARY KEY"]
-      [:username "varchar(20)"]
-      [:title "varchar(70)"]
-      [:synopsis "varchar(200)"]
+      [:username (varchar username-maxlen)]
+      [:title (varchar title-maxlen)]
+      [:synopsis (varchar synopsis-maxlen)]
       [:published "boolean"]
       [:data "text"]
       [:script "text"]))) 
