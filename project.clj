@@ -2,6 +2,7 @@
   :description "FIXME: write description"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.6.0"]
+                 [clojure-watch "0.1.9"]
                  [org.marianoguerra/clj-rhino "0.2.1"]
                  [org.clojure/java.jdbc "0.3.3"]
                  [postgresql/postgresql "8.4-702.jdbc4"]
@@ -28,7 +29,8 @@
    {:ring
     {:open-browser? false, :stacktraces? false, :auto-reload? false}}
    :dev
-   {:dependencies [[ring-mock "0.1.5"] [ring/ring-devel "1.2.1"]]}})
+   {:dependencies [[ring-mock "0.1.5"] [ring/ring-devel "1.2.1"]]
+    :injections (require ['clojure.repl :refer '(doc)])}})
 
 
 
