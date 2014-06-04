@@ -24,7 +24,8 @@
   (let [scope (js/new-safe-scope)
         scripts (with-common "parser.js")]
     (doseq [s scripts]
-      (js/eval scope (read-resource s)))))
+      (js/eval scope (read-resource s)))
+    scope))
 
 (defn create-react-scope []
   (let [scripts (with-common 
