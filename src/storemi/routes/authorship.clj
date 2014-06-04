@@ -9,6 +9,7 @@
     [storemi.session :as sess]
     [storemi.models.story :as st]
     [storemi.urlfor :as url]
+    [storemi.js :as js]
     [storemi.routes.policies :refer
      [enforce-story
       enforce-user
@@ -30,10 +31,25 @@
   (when-not (sess/logged-in? request)
     {:error "You must be logged in"}))
 
+(defn script-is-valid [{params :params}]
+  (let [script (:script params)
+        data (:data params)
+        {:keys [storyTitle synopsis]} data]
+    (cond
+      (> (count storyTitle) st/title-maxlen)
+      {:error "Title is freakin' too long"}
+      (> (count synopsis) st/synopsis-maxlen)
+      {:error "I don't think you know what a synopsis is"})))
+
 (def story-ownership-rules
   (one-by-one
     user-is-logged-in
     user-owns-story))
+
+(def story-edition-rules
+  (one-by-one
+    story-ownership-rules
+    script-is-valid))
 
 (def story-creation-rules
   (one-by-one
@@ -51,14 +67,12 @@
         (sess/add-notification "Story created"))))
 
 (defn proceed-edition [{params :params :as req}]
-  (let [data (select-keys params [:storyTitle :synopsis])
+  (let [{:keys [data script]} params
         id (:story-id params)
-        script (clojure.string/replace 
-                 (:script params) "\r" "")
-        path 
-        (if (:saview params)
-          (url/story (sess/username req) id)
-          (:uri req))]
+        path (if (:saview params)
+               (url/story (sess/username req) id)
+               (:uri req))]
+    (println "-> " data)
     (st/update-story id data script)
     (-> (redirect path)
         (sess/add-notification "Story saved"))))
@@ -71,7 +85,7 @@
 
 (def resubmit-story
   (enforce-story
-    story-ownership-rules
+    story-edition-rules
     :fail page/story-edit
     :succ proceed-edition))
 
@@ -98,6 +112,16 @@
           (fn [request]
             (:script (st/story-match-by request)))))
 
+(defn wrap-parse-script [handler]
+  (fn [request]
+    (let [script (get-in request [:params :script])
+          script (clojure.string/replace script "\r" "")
+          data (js/parse-script script)
+          request (-> request
+                      (assoc-in [:params :script] script)
+                      (assoc-in [:params :data] data))]
+      (handler request))))
+
 ;; TODO: GET, POST and others actually can take a 
 ;; function directly instead of an expresssion.
 ;; Thus, rewrite to obliterate redundancies.
@@ -106,11 +130,13 @@
   (routes
     (POST url/story-create-path request
          (submit-story request))
+
     (GET url/story-create-path request
          (page/story-create request))
 
-    (POST url/story-edit-path request
-         (resubmit-story request))
+    (POST url/story-edit-path _
+         (wrap-parse-script resubmit-story))
+
     (GET url/story-edit-path request
          (coerce enforce-user-owned-story page/story-edit))
 
@@ -135,6 +161,7 @@
     (GET url/scene-path request
          (coerce enforce-user-story page/story))
     ))
+
 
 
 
