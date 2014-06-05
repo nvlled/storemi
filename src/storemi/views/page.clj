@@ -1,7 +1,8 @@
 (ns storemi.views.page
   (:require
     [ring.util.response :as ring]
-    [storemi.session :as session]  
+    [ring.util.codec :refer [form-encode]]
+    [storemi.session :as session]
     [storemi.models.story :as st]
     [storemi.models.db :as db]
     [storemi.views.component :as cmpt]
@@ -17,7 +18,7 @@
                :title "Uh-oh"
                :body [:h2 "Error: "
                       (or (get-in request [:errors :msg])
-                          "You borke the internets.")])] 
+                          "You borke the internets.")])]
     {:body body
      :status (or status 404)}))
 
@@ -28,13 +29,13 @@
     :body [:h2 "Acsess granded :DDDDDD"]))
 
 (defn about [request]
-  (layout/common 
+  (layout/common
     request
     :title "About"
     :body
     [:div
      [:h2 "What is it?"]
-     [:p 
+     [:p
       "It is a platform for narrating stories in a sort of different way. "
       "The readers inspect objects in a scene, and each objects leads to yet other scenes. "
       "The sub-scene may just provide description of an object, or it may entirely "
@@ -46,9 +47,9 @@
       "the story, distinct only for each particular reader."]]))
 
 (defn home [req]
-  (layout/common 
+  (layout/common
     req
-    :body 
+    :body
     [:div
      (when (session/logged-in? req)
        (cmpt/story-creator req))
@@ -65,7 +66,7 @@
 ;     [:input {:type :submit :value "login"}]]))
 
 (defn login [{errors :errors :as req}]
-  (layout/common 
+  (layout/common
     req
     :title "Login"
     :body
@@ -78,7 +79,7 @@
      [:a {:href (detour-param-key req "/register")} "[register]"]]))
 
 (defn register [{errors :errors :as req}]
-  (layout/common 
+  (layout/common
     req
     :title "Register"
     :body
@@ -86,9 +87,9 @@
      [:p.error (:error errors)]
      (cmpt/text-field req "username" :errors errors)
      (cmpt/password-field req "password" :errors errors)
-     (cmpt/password-field 
-       req "password2" 
-       :label "re-enter password" 
+     (cmpt/password-field
+       req "password2"
+       :label "re-enter password"
        :errors errors)
      [:input {:type "submit" :value "register"}]
      [:a {:href (detour-param-key req "/login")} "[login]"]]))
@@ -150,7 +151,7 @@
   (cmpt/json-field paths :id "paths"))
 
 (defn render-story-component [story paths]
-  (js/render-story-component (:data story) paths)) 
+  (js/render-story-component (:data story) paths))
 
 (defn insert-data [story new-data]
   (update-in story
@@ -161,13 +162,13 @@
                        story
                        & {:keys [id class]}]
   (let [ids (select-keys params [:chapter-id :scene-id])
-        story (insert-data 
+        story (insert-data
                 (st/story-match request) ids)
         paths (create-paths request story)]
-    [:div 
+    [:div
      (cmpt/json-field ids :id "story-ids")
      (create-path-fields paths)
-     [:textarea {:id "story-script"} 
+     [:textarea {:id "story-script"}
       (db/json-string (:data story))]
      [:div {:id id :class class}
       (js/render-story-component (:data story) paths)]]))
@@ -176,8 +177,8 @@
   (layout/common
     request
     :body
-    (story-component 
-      request 
+    (story-component
+      request
       (st/story-match request)
       :id "contents")
     :scripts ["/js/react.min.js"
@@ -224,19 +225,21 @@
   [:table.stories
    [:thead
     [:tr
-     [:td "author"]
-     [:td "title"]
-     [:td "synopsis"] ]
+     [:td.author "author"]
+     [:td.title "title"]
+     [:td.synopsis "synopsis"] ]
     ]
    [:tbody
     (for [story stories]
       [:tr
-       [:td (:username story)]
-       [:td (:title story)]
+       [:td (cmpt/user-link (:username story))]
+       [:td (cmpt/story-link story)]
        [:td (:synopsis story)] ])]])
 
-(defn browse [request]
-  (let [stories (st/recent-stories)]
+(defn browse [request & [search-result]]
+  (let [{:keys [by query]} (:params request)
+        {:keys [total stories page-data]} search-result
+        stories (or stories (st/recent-stories))]
     (layout/common
       request
       :styles ["/css/browse.css"]
@@ -245,14 +248,43 @@
        [:h1 "Browse crappy stories"]
        [:form {:class "search-form"}
         [:p "Search: "
-         [:input {:name "title-query"}]
+         (cmpt/hidden-field "0" :name "page")
+         [:input {:name "query" :value query}]
          [:input {:type :submit :value "search"}]
          [:label
-          [:input {:type :radio :name "basis"}]
+          [:input {:type :radio :name "by" :value "any"
+                   :checked :false}]
+          "any"]
+         [:label
+          [:input {:type :radio :name "by" :value "title"
+                   :checked (= by "title")}]
           "title"]
          [:label
-          [:input {:type :radio :name "basis"}]
-          "synopsis"]]]
+          [:input {:type :radio :name "by" :value "synopsis"
+                   :checked (= by "synopsis")}]
+          "synopsis"]
+         [:label
+          [:input {:type :radio :name "by" :value "username"
+                   :checked (= by "username")}]
+          "username"]]]
        [:hr]
-       (story-table stories)])))
+       (if-not (empty? stories)
+         (story-table stories)
+         [:em "(no match found)"])
+       (when page-data
+         (let [page-count (/ total (:size page-data))
+               page-num (:pagenum page-data)
+               qparams (:query-params request)]
+           (when (> page-count 1)
+             (for [p (range page-count)]
+               [:span
+                [:a.page {:class (when (= page-num p) "active")
+                     :href
+                     (str (:uri request)
+                          "?"
+                          (form-encode
+                            (assoc qparams "page" p)))}
+                 (str "[" p "]")]]
+
+               )))) ])))
 
