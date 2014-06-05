@@ -24,11 +24,11 @@
   (try
     (if (integer? n)
       n
-      (-> n read-string int)) 
+      (-> n read-string int))
     (catch Exception e defval)))
 
 (defn find-with-val [col k v]
-  (let [pred 
+  (let [pred
         (fn [obj]
           (= v (get obj k)))]
     (->> col
@@ -38,7 +38,7 @@
 (defn trim-slash2 [s]
   (let [is-slash #(= % \/)
         not-slash #(not= % \/)]
-    (->> 
+    (->>
       s
       (drop-while is-slash)
       (take-while not-slash)
@@ -50,8 +50,8 @@
 
 (defn trim-leading-slash [s]
   (if (instance? String s)
-    (apply 
-      str 
+    (apply
+      str
       (if (= (first s) \/)
         (rest s)
         s))
@@ -73,8 +73,8 @@
        (apply str)))
 
 (defn with-base [base-url & paths]
-  (clojure.string/join 
-    "/" (cons-apply 
+  (clojure.string/join
+    "/" (cons-apply
           (cons base-url paths)
           trim-trailing-slash
           trim-slash)))
@@ -92,4 +92,11 @@
       (reset!
         expr
         (future (Thread/sleep millis) (apply f args))))))
+
+(defn safe-subvec [v start end]
+  (let [end (min (count v)
+                 end)]
+    (try
+      (subvec v start end)
+      (catch IndexOutOfBoundsException e []))))
 
