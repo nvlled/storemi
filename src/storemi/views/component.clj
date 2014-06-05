@@ -76,7 +76,7 @@
 
 (defn notification [msg]
   (when msg
-    [:div.notification [:h4 "(!!)" msg]]))
+    [:div.notification [:h4 msg]]))
 
 (defn main-nav [& [username]]
   [:span.nav

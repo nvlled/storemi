@@ -112,6 +112,7 @@ a.active {
 }
 
 .notification {
+	margin: 5px;
     color: green;
 }
 

@@ -31,10 +31,13 @@
     [:body
      ;(request-helper req)
      [:div#wrapper
+
       [:h1.logo [:a {:href "/"} settings/site-name]]
       " | "
       [:p.desc settings/site-desc]
       [:br]
+
+
       (let [logged-in (session/logged-in? req)
             username (session/username req)]
         (list
@@ -42,7 +45,9 @@
             [:span username " -> "])
           (cmpt/hidden-field username :id "my-username")
           (cmpt/main-nav username)))
-      ;(request-helper req)
+      [:div.notification
+       [:noscript "You have javascript disabled. You will
+                  have a suboptimal experience."]]
       (cmpt/notification
         (session/get-notification req))
       [:div.header-split]
