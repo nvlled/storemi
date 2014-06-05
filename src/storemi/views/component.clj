@@ -1,13 +1,13 @@
 (ns storemi.views.component
-  (:require 
+  (:require
     [hiccup.page :refer [html5 include-css]]
     [storemi.models.db :refer [json-string]]
     [storemi.settings :as settings]
     [storemi.urlfor :as urlfor]))
 
 (defn hidden-field [val & {:keys [name id class]}]
-  (let [props {:type "hidden" 
-               :name name 
+  (let [props {:type "hidden"
+               :name name
                :value (or val "")
                :id id
                :class class}]
@@ -24,30 +24,30 @@
   [stories & [hide-author]]
   [:ul
    (for [{:keys [id title synopsis username]} stories]
-     [:li 
+     [:li
       [:a {:href (urlfor/story username id)} title]
-      (when-not hide-author 
-        [:span " — " synopsis " "]    
+      (when-not hide-author
+        [:span " — " synopsis " "]
         [:i [:a {:href (urlfor/user-index username)}
-             " [ by " username " ]"]])])]) 
+             " [ by " username " ]"]])])])
 
 (defn story-control-list
   ([stories & args]
    [:ul
     (for [{:keys [id title username]} stories]
-      [:li 
-       [:a {:href (urlfor/story username id)} 
+      [:li
+       [:a {:href (urlfor/story username id)}
         title]
        " "
        [:a {:href (urlfor/story-edit username id)} "[edit]"]
        " "
        [:a {:href (urlfor/story-delete username id)} "[delete]"]])]))
 
-(defn input-field 
+(defn input-field
   ([name & {:keys [label errors type value]}]
    (let [fk (keyword name)
          label (or label name)]
-     [:p (str label ": ") 
+     [:p (str label ": ")
       [:input {:name name :value value :type type}]
       [:span.error (fk errors)]])))
 
@@ -58,7 +58,7 @@
                :errors errors))
 
 (defn password-field [request name & {:keys [label errors]}]
-  (input-field name 
+  (input-field name
                :label label
                :type "password"
                :errors errors))
@@ -81,20 +81,20 @@
 (defn main-nav [& [username]]
   [:span.nav
    (if-not (empty? username)
-     (list 
+     (list
        [:a {:href (urlfor/logout)} "logout"]
        [:a {:href (urlfor/user-index username)} "your stories"] )
      (list
        [:a {:href (urlfor/login)} "login"]
        [:a {:href (urlfor/register)} "register"]))
-   [:a {:href (urlfor/about)} "about"]
-   [:a {:href (urlfor/browse)} "browse"]])
+   [:a {:href (urlfor/browse)} "browse"]
+   [:a {:href (urlfor/about)} "about"]])
 
 (defn story-creator [{errors :errors :as req}]
   [:form.story-creator
    {:method "POST" :action (urlfor/story-create)}
    [:h4 "Write New Story"]
-   [:p "Title " 
+   [:p "Title "
     [:input {:name "title" :value (get-in req [:params :title])}]
     [:span.error (:title errors)]]
    [:p "Synopsis "]
@@ -107,16 +107,16 @@
 (defn editing-options []
   [:div.editing-options
    [:h4 "Editing options"]
-   [:p [:input {:name "readingMode" :type :checkbox} 
+   [:p [:input {:name "readingMode" :type :checkbox}
         "Reading mode"]]
    [:div.settings
-    [:p [:input {:name "hideSynopsis" :type :checkbox} 
+    [:p [:input {:name "hideSynopsis" :type :checkbox}
          "Hide synopsis"]]
-    [:p [:input {:name "hideChapterIndex" :type :checkbox} 
+    [:p [:input {:name "hideChapterIndex" :type :checkbox}
          "Hide chapter index "]]
-    [:p [:input {:name "hideSceneIndex" :type :checkbox} 
+    [:p [:input {:name "hideSceneIndex" :type :checkbox}
          "Hide scene index "]]
-    [:p [:input {:name "hideWarnings" :type :checkbox} 
+    [:p [:input {:name "hideWarnings" :type :checkbox}
          "Hide warnings"]]
     ]])
 
@@ -137,7 +137,7 @@
 
 (defn story-editor [story & [script]]
   [:div {:id "create"}
-   [:input {:id "disable-upload" 
+   [:input {:id "disable-upload"
             :type :hidden
             :value (when settings/disable-upload "1")}]
    [:p "script"]
@@ -151,5 +151,12 @@
     (editing-options)]]
   )
 
+(defn story-link [story & [title]]
+  [:a {:href (urlfor/story (:username story) (:id story))}
+   (or (:title story) title)])
+
+(defn user-link [username]
+  [:a {:href (urlfor/user-index username)}
+   username])
 
 
