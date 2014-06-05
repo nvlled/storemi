@@ -197,6 +197,52 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
        limit ?"
        limit])))
 
+(defn select-sql [& addendums]
+  (str "select * from stories "
+       (apply str addendums)))
+
+(defn filter-sql [exact & criterias]
+  (let [s (if exact
+            "%s = ?"
+            "%s ~* ?")]
+    (str
+      "where "
+      (apply str
+             (interpose " or " (map #(format s %) criterias))))))
+
+(defn valid-column [name]
+  (some #(= name %) ["username" "title" "synopsis"]))
+
+(defn what-sql [val criteria & [exact]]
+  (if (valid-column criteria)
+    [(select-sql (filter-sql exact criteria)) val]
+    [(select-sql
+       (filter-sql exact "username" "title" "synopsis"))
+     val val val]))
+
+(defn what-page [page-data]
+  (when page-data
+    ; safe if only page-data isn't direct user input
+    (format "limit %d offset %d"
+            (:limit page-data)
+            (:offset page-data))))
+
+(defn query-stories [val & {:keys [criteria exact page-data]}]
+  (let [sql (if-not val
+              (select-sql)
+              (what-sql val criteria exact))
+        result (vec (db/query sql))]
+
+    {:page-data page-data
+     :total (count result)
+     :stories
+     (if (empty? (select-keys page-data [:start :end]))
+       result
+       (com/safe-subvec
+         result
+         (:start page-data)
+         (:end page-data)))}))
+
 (defn user-stories [username]
   (db/query
     ["select id, title, username from stories where username = ?
