@@ -2,6 +2,7 @@
 
 table {
 	width: 100%;
+	table-layout: fixed;
 }
 
 table.stories thead td {
@@ -15,4 +16,13 @@ td {
 }
 
 td img {
+}
+
+a.page {
+	text-decoration: none;
+	margin-right: 10px;
+}
+
+td.author {
+	width: 15%;
 }

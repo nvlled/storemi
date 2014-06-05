@@ -7,7 +7,7 @@ body {
 }
 
 #wrapper {
-    width: 60%;
+    width: 100%;
 }
 
 #create {
@@ -61,11 +61,6 @@ body {
 }
 
 
-#wrapper {
-    width: 90%;
-    margin: auto;
-}
-
 .thumbnail {
 	width: 20%;
 }
@@ -104,7 +99,5 @@ td img {
 .centered {
 	text-align: center;
 }
-
-
 
 

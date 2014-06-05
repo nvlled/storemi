@@ -63,11 +63,11 @@ img {
 
 h1 {
     font-size: 22px;
-} 
+}
 
 h2 {
     font-size: 20px;
-} 
+}
 
 input.flash {
     background-color: #f00;
@@ -183,3 +183,9 @@ form.story-settings input[name=close]{
 #story-script {
 	display: none;
 }
+
+table {
+	table-layout: fixed;
+}
+
+
