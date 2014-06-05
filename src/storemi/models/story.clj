@@ -1,5 +1,5 @@
 (ns storemi.models.story
-  (:require 
+  (:require
     [clojure.walk :refer [keywordize-keys]]
     [hiccup.util :refer [escape-html]]
     [clj-http.client :as client]
@@ -24,19 +24,19 @@ This is a stub. [a: Link to scene A]. Say some stuff here. Some [b: Link to scen
 
 # a: 1.2
 # b: 1.3
-  
+
 *** (1.2) Scene A
 Stuffs and stuffs. Saying about stuff here. {a: Link to chapter 2} and [b: link to scene C]. Oh yeah, more stuff to say.
 
 You see a sample image
-  
+
 <sample: A text describing the image>
 
 You are enlightened.
 
 # a: 2
 # b: 1.4
-  
+
 *** (1.3) Scene B
 The zombie stuff ate some zomebie stuff. Go to [a: scene C]
 
@@ -45,7 +45,7 @@ The zombie stuff ate some zomebie stuff. Go to [a: scene C]
 *** (1.4) Scene C
 This scene stuff has no stuff in it so no more stuff to say.
 
-  
+
 ** (2) Chapter 2
 
 *** (2.1) Opening scene of chapter 2
@@ -57,7 +57,7 @@ Oh yeah, what's your name stuff? --b: stuffname, ok--
 
 *** (2.2) Stuff response
 Got it, your stuffname is ++stuffname++. Well then, off to {a: chapter 3} then, ++stuffname++.
-  
+
 # a: 3
 
 ** (3) Chapter 3
@@ -90,10 +90,10 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
       [:synopsis (varchar synopsis-maxlen)]
       [:published "boolean"]
       [:data "text"]
-      [:script "text"]))) 
+      [:script "text"])))
 
 (defn insert-story [story]
-  (let [{:keys [title username data script synopsis]} 
+  (let [{:keys [title username data script synopsis]}
         story
         response
         (db/insert!
@@ -108,7 +108,7 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
 (defn create-story [creator title &[synopsis]]
   (let [script (render-template title (or synopsis))
         data (js/parse-script script)]
-    (insert-story 
+    (insert-story
       {:username creator
        :script script
        :data data
@@ -116,15 +116,15 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
        :synopsis synopsis})))
 
 (defn user-owned [{:keys [username id]}]
-  (let [data (db/query-one 
-               ["select * from stories where id = ?" 
+  (let [data (db/query-one
+               ["select * from stories where id = ?"
                 (com/read-int id -1)])]
     (= (:username data) username)))
 
 (defn update-story [id data script]
   (db/update!
     :stories
-    (db/remove-nil 
+    (db/remove-nil
       {:title (get data :storyTitle)
        :synopsis (get data :synopsis)
        :data (db/json-string data)
@@ -132,18 +132,18 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
     ["id = ?" (com/read-int id -1)]))
 
 (defn get-story [id]
-  (let [result 
+  (let [result
         (db/query-one
-          ["select * from stories where id = ?" 
+          ["select * from stories where id = ?"
            (com/read-int id -1)]) ]
     (when result
       (assoc result :data
              (db/json-parse (:data result))))))
 
 (defn get-story-by [username id]
-  (let [result 
+  (let [result
         (db/query-one
-          ["select * from stories where id = ? and username = ?" 
+          ["select * from stories where id = ? and username = ?"
            (com/read-int id -1) username]) ]
     (when result
       (assoc result :data
@@ -158,7 +158,7 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
      (get-in request [:params :username])
      request))
   ([username request]
-   (get-story-by 
+   (get-story-by
      username
      (get-in request [:params :story-id]))))
 
@@ -168,14 +168,14 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
      username]))
 
 (defn assoc-default-bindings [story chapter]
-  (assoc 
+  (assoc
     chapter
     "defaultBindings" (get story "defaultBindings")
     "story" story))
 
 (defn get-chapter [story ch-id]
-  (when-let [chapter 
-             (com/find-with-val 
+  (when-let [chapter
+             (com/find-with-val
                (get story "chapters") "label" ch-id)]
     (assoc-default-bindings story chapter)))
 
@@ -185,35 +185,31 @@ saying stuff about the scene stuff. Hello, ++stuffname++, nice bad weather we're
     (first (get story "chapters"))))
 
 (defn get-scene [chapter sc-id]
-  (com/find-with-val 
+  (com/find-with-val
     (get chapter "scenes") "label" sc-id))
 
 (defn recent-stories [& [limit]]
-  (let [limit (or limit 10)
+  (let [limit (or limit 5)
         limit (min limit 100)]
-    (db/query 
-      ["select id, title, synopsis, username from stories 
+    (db/query
+      ["select id, title, synopsis, username from stories
        order by id desc
-       limit ?" 
+       limit ?"
        limit])))
 
 (defn user-stories [username]
-  (db/query 
+  (db/query
     ["select id, title, username from stories where username = ?
-     order by id desc" 
+     order by id desc"
      username]))
 
 (defn delete-story [username id]
-  (db/delete! :stories 
-              ["username = ? and id = ?" 
+  (db/delete! :stories
+              ["username = ? and id = ?"
                username (com/read-int id -1)]))
 
 (defn from-request [{params :params}]
-  (select-keys 
+  (select-keys
     params [:id :username :title :body :script :synopsis :data]))
-
-
-
-
 
 

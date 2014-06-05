@@ -1,5 +1,5 @@
 (ns storemi.models.db
-  (:require 
+  (:require
     [clj-rhino :as js]
     [clojure.walk :refer [keywordize-keys]]
     [storemi.common :refer [read-resource]]
@@ -35,14 +35,14 @@
        (catch Exception _)))
 
 (defn json-string-vals [m & ks]
-  (reduce 
+  (reduce
     (fn [acc k]
       (assoc acc k
              (if (nil? (m k))
                (m k)
                (json-string (m k)))))
-    m 
-    ks)) 
+    m
+    ks))
 
 (defn remove-nil [m]
   (into {} (filter #(-> % second nil? not) m)))
@@ -79,14 +79,14 @@
   (try
     (query [(str "select * from "
                  (apply str (interpose "," known-tables))
-                 " limit 1")]) 
+                 " limit 1")])
     true
     (catch Exception e false)))
 
 (defn test-connection []
   (try
     (query ["select 1" ])
-    (catch Exception e 
+    (catch Exception e
       (println "*** Failed to connect to database: " (.getMessage e))
       (println "*** Configure default-db at src/storemi/settings.clj")
       (System/exit 1))))
