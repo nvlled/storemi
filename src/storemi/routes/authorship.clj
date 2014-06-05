@@ -23,7 +23,7 @@
       enforce]]))
 
 (defn user-owns-story [req]
-  (when-not 
+  (when-not
     (st/story-match-by (sess/username req) req)
     {:error "User does not own story"}))
 
@@ -60,7 +60,7 @@
   (let [title (get-in request [:params :title])
         synopsis (get-in request [:params :synopsis])
         username (sess/username request)
-        story (st/create-story 
+        story (st/create-story
                 username title synopsis)]
     (-> (url/story-edit username (:id story))
         redirect
@@ -122,45 +122,38 @@
                       (assoc-in [:params :data] data))]
       (handler request))))
 
-;; TODO: GET, POST and others actually can take a 
-;; function directly instead of an expresssion.
-;; Thus, rewrite to obliterate redundancies.
-
 (def the-routes
   (routes
-    (POST url/story-create-path request
-         (submit-story request))
+    (POST url/story-create-path -> submit-story)
 
-    (GET url/story-create-path request
-         (page/story-create request))
+    (GET url/story-create-path -> page/story-create)
 
-    (POST url/story-edit-path _
-         (wrap-parse-script resubmit-story))
+    (POST url/story-edit-path
+          -> (wrap-parse-script resubmit-story))
 
-    (GET url/story-edit-path request
-         (coerce enforce-user-owned-story page/story-edit))
+    (GET url/story-edit-path
+         -> (coerce enforce-user-owned-story page/story-edit))
 
-    (POST url/story-delete-path request
-         (delete-story request))
-    (GET url/story-delete-path request
+    (POST url/story-delete-path -> delete-story)
+
+    (GET url/story-delete-path ->
          (coerce enforce-user-owned-story page/story-delete))
 
-    (GET url/user-index-path request
-         (user-index request))
+    (GET url/user-index-path -> user-index)
 
-    (GET url/story-index-path request
-         (page/story-index request))
+    (GET url/story-index-path -> page/story-index)
 
-    (GET url/story-data-path request
-         (story-data request))  
+    (GET url/story-data-path -> story-data)
 
-    (GET url/story-path request
-         (coerce enforce-user-story page/story))
-    (GET url/chapter-path request
-         (coerce enforce-user-story page/story))
-    (GET url/scene-path request
-         (coerce enforce-user-story page/story))
-    ))
+    (GET url/story-path
+         -> (coerce enforce-user-story page/story))
+
+    (GET url/chapter-path
+         -> (coerce enforce-user-story page/story))
+
+    (GET url/scene-path
+         -> (coerce enforce-user-story page/story))))
+
 
 
 
