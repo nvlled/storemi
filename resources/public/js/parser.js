@@ -2,14 +2,14 @@
 
 
 // TODO: Define the following
-// - nextSection 
+// - nextSection
 // - sectionType
 
 
 // Ugly (yet minimal) hack to make it work on node and on the browser
 try {require} catch(e) {require = function(){}};
 function requireAs(libpath, varname) {
-    if (!root[varname]) 
+    if (!root[varname])
         return require(libpath);
 	return root[varname];
 }
@@ -120,11 +120,12 @@ function parseChapters(lines, index) {
 
 	var warnings = [];
 	var counter = new Counter();
-    var chapters =  _.map(grouped, function(lines) {
+    var chapters =  _.map(grouped, function(m) {
+		var lines = m.lines;
         var chapterData = parseMarkedData(lines[0]);
         var scenes = [];
         if (lines.length >= 2) {
-            var scenes = parseScenes(lines, 0);
+            var scenes = parseScenes(lines, 0, m.lineno);
         }
 		var label = chapterData.label;
 
@@ -133,15 +134,11 @@ function parseChapters(lines, index) {
 			warnings.push("Chapter label " + label + " is duplicated");
 
         return {
+			lineno: m.lineno,
             label: chapterData.label,
             title: chapterData.text,
             scenes: scenes,
         }
-        // - combine each mappings of each scene
-        // - scene.label -> scene.label
-        // - create a tree from the mappings
-        // - where the root is the first scene
-        // - give each path a unique label
     });
 	chapters.warnings = warnings;
 	return chapters;
@@ -161,14 +158,14 @@ Counter.prototype.inc = function(key) {
 	store[key]++;
 }
 
-function parseScenes(lines, index) {
+function parseScenes(lines, index, lineno) {
     lines.push(MARKER.SCRIPT_END);
-    var grouped = groupWith(lines, index, nextSceneIndex);
+    var grouped = groupWith(lines, index, nextSceneIndex, lineno);
 
 	var warnings = [];
 	var counter = new Counter();
-    var scenes = _.map(grouped, function(lines) {
-
+    var scenes = _.map(grouped, function(m) {
+		var lines = m.lines;
         var sceneData = parseMarkedData(lines[0]);
         var text = getSceneText(lines, 1).trim();
         var mappings = getMappings(lines);
@@ -180,6 +177,7 @@ function parseScenes(lines, index) {
 			warnings.push("Scene label " + label + " is duplicated");
 
         return {
+			lineno: m.lineno,
             label: label,
             title: sceneData.text,
             contents: contents,
@@ -224,12 +222,16 @@ function parseSceneText(text) {
     return tokens;
 }
 
-function groupWith(lines, startIndex, nextfn) {
+function groupWith(lines, startIndex, nextfn, lineno) {
+	lineno = lineno || 0;
     var indices = getIndices(lines, startIndex, nextfn);
     indices.push(lines.length-1);
 
     return _.map(groupByTwos(indices), function(pair) {
-        return lines.slice(pair.fst, pair.snd);
+		return {
+			lineno: lineno + pair.fst,
+			lines: lines.slice(pair.fst, pair.snd),
+		}
     });
 }
 
@@ -389,7 +391,7 @@ function nextMarker(startIndex, lines) {
     var i =  nextIndex(startIndex, lines, isMarked);
 	if (i < 0)
 		return lines.length;
-	return i; 
+	return i;
 }
 
 function nextIndex(index, lines, pred) {
@@ -465,7 +467,7 @@ Token.processors = {
 			self.text = split[0];
             if (split.length >= 2) {
                 self.buttonVal = split[1];
-            } 
+            }
         }
     },
 
@@ -494,9 +496,9 @@ Token.parse = function(text) {
         var closing = wrapper[1];
 
         if (startsWith(text, opening)) {
-            //return new Token(name, 
+            //return new Token(name,
             //text.slice(opening.length, text.length-closing.length));
-            return Token.create(name, 
+            return Token.create(name,
                 text.slice(opening.length, text.length-closing.length));
         }
     }
@@ -521,11 +523,11 @@ function buildPattern() {
     var esc = escapeRegExp;
     _.each(_.values(TPAIRS), function(pair) {
 		//patterns.push([esc(pair[0]), ".+?", esc(pair[1])].join(""));
-		var open = esc(pair[0]); 
+		var open = esc(pair[0]);
 		var close = esc(pair[1]);
 		patterns.push([
 			open,
-			".+?", 
+			".+?",
 			close,
 		].join(""));
     });
