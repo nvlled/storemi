@@ -168,22 +168,25 @@
     [:div
      (cmpt/json-field ids :id "story-ids")
      (create-path-fields paths)
-     [:textarea {:id "story-script"}
-      (db/json-string (:data story))]
+
      [:div {:id id :class class}
       (js/render-story-component (:data story) paths)]]))
 
 (defn story [{params :params :as request}]
-  (layout/common
-    request
-    :body
-    (story-component
+  (let [story-data (st/story-match request)]
+    (layout/common
       request
-      (st/story-match request)
-      :id "contents")
-    :scripts ["/js/react.min.js"
-              "/js/react/story-ui.react.js"
-              "/js/view-story.js"]))
+      :body
+      [:div
+       [:textarea {:id "story-script"}
+        (db/json-string (:data story-data))]
+       (story-component
+         request
+         story-data
+         :id "contents")]
+      :scripts ["/js/react.js"
+                "/js/react/story-ui.react.js"
+                "/js/view-story.js"])))
 
 (defn story-edit [{errors :errors :as request}]
   (let [script (get-in request [:params :script])
@@ -193,11 +196,10 @@
       :body
       [:div.editor
        (when errors
-         [:p.error "Save failed: " (:error errors)]
-         )
+         [:p.error "Save failed: " (:error errors)])
        (cmpt/story-editor story script)
        (story-component request story :id "view")]
-      :scripts ["/js/react.min.js"
+      :scripts ["/js/react.js"
                 "/js/parser.js"
                 "/js/react/story-ui.react.js"
                 "/js/react/editor.react.js"
