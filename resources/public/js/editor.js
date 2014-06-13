@@ -207,14 +207,24 @@ function bind(obj, fnname) {
 function jumpTo(textarea, lineno) {
 	//textarea = sel(document, "textarea");
 	var rows = textarea.value.split("\n");
-
 	var rowCount = rows.length;
-	// Also fix by roundng the lineheight
-	var lineheight = Math.floor(textarea.scrollHeight / rowCount);
+	var lineheight = Math.round(textarea.scrollHeight / rowCount);
 	var pos = (lineno - 2) * lineheight;
 	textarea.scrollTop = pos;
+	selectLine(textarea, lineno);
 }
-this.jumpTo = jumpTo;
+
+function selectLine(textarea, lineno) {
+	var rows = textarea.value.split("\n");
+	var start = 0, end = 0;
+	for (var i = 0; i != lineno; i++) {
+		start += rows[i].length+1;
+	}
+	var end = start + rows[i].length;
+	textarea.selectionStart = start;
+	textarea.selectionEnd = end+1;
+	textarea.focus();
+}
 
 
 })(this);
