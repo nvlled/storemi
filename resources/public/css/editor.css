@@ -109,3 +109,9 @@ td img {
 .jump-source:hover{
 	text-decoration: overline;
 }
+
+.unsaved-msg {
+	display: none;
+	color: #b00;
+	float: right;
+}

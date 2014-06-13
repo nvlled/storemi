@@ -28,6 +28,7 @@ window.addEventListener("load", function() {
 		var data = parseScript(textarea.value);
 		sel(form, "input[name=storyTitle]").value = data.storyTitle;
 		sel(form, "input[name=synopsis]").value = data.synopsis;
+		sel(document, "input[type=unsaved]").value = "";
 		//e.preventDefault();
 	});
 
@@ -56,8 +57,18 @@ function getUploader() {
 function ScriptEditor(textarea) {
 	this.textarea = textarea;
 	this.listeners = [];
+	var unsaved = sel(document, "input[name=unsaved]");
+	var unsavedMsg = sel(document, ".unsaved-msg");
 
-	//textarea.onkeyup = _.throttle(function() {
+	if (!!unsaved.value)
+		unsavedMsg.style.display = 'inherit';
+	else
+		unsavedMsg.style.display = 'none';
+
+	textarea.addEventListener("keyup",  _.throttle(function() {
+		unsaved.value = "1";
+		unsavedMsg.style.display = 'inherit';
+	}));
 	textarea.addEventListener("keyup",  _.throttle(function() {
 		var data = parseScript(textarea.value);
 		this.notify(data);

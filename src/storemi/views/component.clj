@@ -140,9 +140,11 @@
    [:input {:id "disable-upload"
             :type :hidden
             :value (when settings/disable-upload "1")}]
-   [:p "script"]
+   [:p "script"
+    [:span.unsaved-msg "(unsaved)"]]
    [:form {:action (urlfor/story-edit (:username story) (:id story))
            :method "POST"}
+    [:input {:name "unsaved" :type :hidden}]
     [:input {:name "storyTitle" :type :hidden }]
     [:input {:name "synopsis" :type :hidden }]
     [:textarea {:name "script"} (or script (:script story))]
