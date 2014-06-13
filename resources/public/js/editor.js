@@ -11,11 +11,12 @@ window.addEventListener("load", function() {
 	var readOption = sel(document, "input[name=readingMode]");
 	var initialData = parseScript(textarea.value);
 
-    var storyComponent = Story({ 
+    var storyComponent = Story({
 		paths: getPaths(),
         data: initialData,
 		configMode: readOption.checked ? readingMode : null,
 		config: loadConfiguration(),
+		jumpToSource: jumpTo.bind(null, textarea),
     });
     React.renderComponent(
         storyComponent,
@@ -56,10 +57,11 @@ function ScriptEditor(textarea) {
 	this.textarea = textarea;
 	this.listeners = [];
 
-	textarea.onkeyup = _.throttle(function() {
+	//textarea.onkeyup = _.throttle(function() {
+	textarea.addEventListener("keyup",  _.throttle(function() {
 		var data = parseScript(textarea.value);
 		this.notify(data);
-	}.bind(this), 500);
+	}.bind(this), 500));
 }
 
 ScriptEditor.prototype.bindComponent = function(component) {
@@ -129,7 +131,7 @@ function setupEditingOptions(storyComponent) {
 		view.setConfigMode(this.checked ? readingMode : null);
 
 		var config = null;
-		if (!this.checked) 
+		if (!this.checked)
 			config = loadConfiguration();
 
 		storyComponent.reconfigure(config);
@@ -201,6 +203,23 @@ function bind(obj, fnname) {
 	return _.identity;
 }
 
+// Sauce: http://stackoverflow.com/questions/155306/cross-browser-jump-to-scroll-textarea
+function jumpTo(textarea, lineno) {
+	//textarea = sel(document, "textarea");
+	var rows = textarea.value.split("\n");
+
+	var rowCount = rows.length;
+	// Also fix by roundng the lineheight
+	var lineheight = Math.floor(textarea.scrollHeight / rowCount);
+	var pos = (lineno - 2) * lineheight;
+	textarea.scrollTop = pos;
+}
+this.jumpTo = jumpTo;
 
 
 })(this);
+
+
+
+
+

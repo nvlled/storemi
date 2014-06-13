@@ -22,6 +22,7 @@ var Story = root.Story = React.createClass({
 				configMode: this.props.configMode,
 				chapterId: data["chapter-id"],
 				sceneId: data["scene-id"],
+				jumpToSource: this.props.jumpToSource,
 			}),
 		}
 	},
@@ -58,20 +59,20 @@ var Story = root.Story = React.createClass({
 	render: function() {
 		var story = this.state.data;
 		var view = this.state.view;
-		var chapter = 
+		var chapter =
 			view.getSelectedChapter(story.chapters);
 
 		var chapterComponent;
 		if (chapter) {
-			chapterComponent = 
-				<Chapter 
-					key={chapter.label} 
+			chapterComponent =
+				<Chapter
+					key={chapter.label}
 					story={story}
 					data={chapter}
 					view={view} />;
 		} else {
 			var firstOne = _.first(story.chapters);
-			chapterComponent = 
+			chapterComponent =
 				<ChapterLink chapter={firstOne} view={view}>
 					[read]
 				</ChapterLink>
@@ -95,18 +96,18 @@ var Story = root.Story = React.createClass({
 		return (
 			<div className='story'>
 				<h1 className='story-title'>
-					<ChapterLink view={view} 
+					<ChapterLink view={view}
 						href={view.urlfor('story')}
-						active={!chapter} 
+						active={!chapter}
 						chapter={{}}>
 						{story.storyTitle}
 					</ChapterLink>
 					{renderIf(editURL)(
-					<a className='story-settings' 
+					<a className='story-settings'
 						href={editURL}>
 						[edit]
 					</a>)}
-					<a className='story-settings' 
+					<a className='story-settings'
 						onClick={showSettings}
 						href='x'> [settings]
 					</a>
@@ -122,13 +123,13 @@ var Story = root.Story = React.createClass({
 						<div>{warnings}</div>
 				)}
 				<div className='chapter-history'>
-					<a href='#' 
+					<a href='#'
 						className={cl({invisible: !view.hasPrevious()})}
 						onClick={view.backChapter.bind(view)}>
 						[back]
 					</a>
 					<span />
-					<a href='#' 
+					<a href='#'
 						style={{"float": "right"}}
 						className={cl({invisible: !view.hasNext()})}
 						onClick={view.forwardChapter.bind(view)}>
@@ -151,7 +152,7 @@ var StorySettings = React.createClass({
 	createHandler: function(optionName) {
 		return function() {
 			var node = this.refs[optionName].getDOMNode();
-			var config = { }; 
+			var config = { };
 			config[optionName] = node.checked;
 			this.props.view.reconfigure(config);
 		}.bind(this);
@@ -167,9 +168,9 @@ var StorySettings = React.createClass({
 				<fieldset>
 					<legend>Settings</legend>
 					<label>
-						<input ref='scrollToView' 
+						<input ref='scrollToView'
 							defaultChecked={config.scrollToView}
-							onClick={scrollToView} 
+							onClick={scrollToView}
 							type='checkbox' />
 						Scroll to view
 					</label>
@@ -177,15 +178,15 @@ var StorySettings = React.createClass({
 					<label>
 						<input ref='rememberSubscenes'
 							defaultChecked={config.rememberSubscenes}
-							onClick={rememberSubscenes} 
+							onClick={rememberSubscenes}
 							type='checkbox' />
 						Remember subscenes
 					</label>
 					<br />
-					<input 
+					<input
 						onClick={view.displaySettings.bind(view, false)}
-						name='close' 
-						type='button' 
+						name='close'
+						type='button'
 						value='close' />
 				</fieldset>
 			</form>
@@ -216,15 +217,26 @@ var ChapterIndex = React.createClass({
 		var view = this.props.view;
 		var chapters = this.props.data;
 		var selChapter = view.getSelectedChapter(chapters);
+		var jumpToSource = view.jumpToSource;
 
 		var contents = _.map(chapters, function(chapter) {
 			var active = selChapter && selChapter.label == chapter.label;
 			return (
-				<li>
-					<ChapterLink 
-						chapter={chapter} 
-						active={active} 
+				<li key={chapter.label}>
+					<ChapterLink
+						chapter={chapter}
+						active={active}
 						view={view} />
+					{renderIf(jumpToSource) (
+						<a onClick={function() {
+								jumpToSource(chapter.lineno)
+								return false;
+							}}
+							className='jump-source'
+							href='#'>
+							**
+						</a>
+					)}
 				</li>
 			);
 		});
@@ -241,20 +253,34 @@ var SceneIndex = React.createClass({
 		var chapter = this.props.chapter;
 		var scenes = this.props.data;
 
+		var jumpToSource = view.jumpToSource;
 		var selScene = view.getSelectedScene(chapter);
 		var contents = _.map(scenes, function(scene) {
+
 			var handler = view.selectScene.bind(view, chapter, scene);
 			var className = cl({
 				active: selScene && selScene.label == scene.label
 			});
-			var href = 
+			var href =
 				view.urlfor('scene', chapter.label, scene.label);
 			return (
-				<li><a href={href} 
+				<li>
+					<a href={href}
 						onClick={handler}
 						className={className}>
 						{scene.title}
-				</a></li>
+					</a>
+					{renderIf(jumpToSource) (
+						<a onClick={function() {
+								jumpToSource(scene.lineno)
+								return false;
+							}}
+							className='jump-source'
+							href='#'>
+							***
+						</a>
+					)}
+				</li>
 		)});
 
 		return (
@@ -283,8 +309,8 @@ var Chapter = React.createClass({
 		scene || (scene = _.first(chapter.scenes));
 
 		var sceneComponent;
-		if (scene) sceneComponent = 
-				<Scene 
+		if (scene) sceneComponent =
+				<Scene
 					key={scene.label}
 					story={this.props.story}
 					chapter={chapter}
@@ -305,10 +331,10 @@ var Chapter = React.createClass({
 					<div>{warnings}</div>
 				)}
 				{renderIf(!view.config.hideSceneIndex)(
-					<SceneIndex 
+					<SceneIndex
 						chapter={chapter}
 						data={chapter.scenes}
-						view={view} /> 
+						view={view} />
 					)}
 				<br />
 				{sceneComponent}
@@ -324,7 +350,7 @@ var SceneLink = React.createClass({
 		});
 		return (
 			<a  href={this.props.href}
-				onClick={this.props.onClick} 
+				onClick={this.props.onClick}
 				className={classes}>
 				{this.props.children}
 			</a>
@@ -344,9 +370,9 @@ var Scene = React.createClass({
 	subsceneHandler: function(subscene) {
 		var view = this.props.view;
 		return view.selectSubscene.bind(
-			this.props.view, 
-			this.props.chapter, 
-			this.props.data, 
+			this.props.view,
+			this.props.chapter,
+			this.props.data,
 			subscene
 		);
 	},
@@ -354,7 +380,7 @@ var Scene = React.createClass({
 	chapterHandler: function(toChapter) {
 		var view = this.props.view;
 		return view.selectChapter.bind(
-			this.props.view, 
+			this.props.view,
 			toChapter
 		);
 	},
@@ -362,14 +388,14 @@ var Scene = React.createClass({
     createSceneLink: function(elem, mappings, subscene) {
         var label = elem.label;
         var toScene = {label: mappings[label] || ""};
-		var active = subscene && 
+		var active = subscene &&
 			toScene.label == subscene.label ;
 		var chapter = this.props.chapter;
 		var view = this.props.view;
-		var href = 
+		var href =
 			view.urlfor('scene', chapter.label, toScene.label);
         return (
-			<SceneLink 
+			<SceneLink
 				href={href}
 				toScene={toScene}
 				chapter={this.props.chapter}
@@ -383,7 +409,7 @@ var Scene = React.createClass({
     createChapterLink: function(elem, mappings) {
         var label = elem.label;
         var toChapter = {label: mappings[label] || "nope"};
-		var href = 
+		var href =
 			this.props.view.urlfor('chapter', toChapter.label);
         return (
             <a className='chapter-link'
@@ -407,7 +433,7 @@ var Scene = React.createClass({
         var key = elem.text;
 		var story = this.props.story;
 
-		var active = subscene && 
+		var active = subscene &&
 			toScene.label == subscene.label ;
 
 		var noVal = "XXXXX";
@@ -416,9 +442,9 @@ var Scene = React.createClass({
 
 		var handler = function() {
 			var input = this.refs.input.getDOMNode();
-			var value = input.value = 
+			var value = input.value =
 				(input.value || story.defaultBindings[key]) || noVal;
-			view.bindings.set(key, value); 
+			view.bindings.set(key, value);
 			input.blur();
 			this.subsceneHandler(toScene)();
 			return false;
@@ -431,15 +457,15 @@ var Scene = React.createClass({
 		}.bind(this);
 
 		var chapter = this.props.chapter;
-		var href = 
+		var href =
 			view.urlfor('scene', chapter.label, toScene.label);
         return (
             <span className="game-input">
-                <input 
+                <input
                     ref="input"
                     defaultValue={value}
                     onKeyUp={onKeyUp} />
-				<SceneLink ref='link' 
+				<SceneLink ref='link'
 					href={href}
 					toScene={toScene}
 					chapter={this.props.chapter}
@@ -499,19 +525,19 @@ var Scene = React.createClass({
 		var subscene = view.getSubscene(chapter, scene);
 
 		var subsceneComponent;
-		if (subscene) subsceneComponent = 
-				<Scene 
+		if (subscene) subsceneComponent =
+				<Scene
 					key={scene.label}
 					story={this.props.story}
-					chapter={chapter} 
-					data={subscene} 
+					chapter={chapter}
+					data={subscene}
 					view={view} />
-		
+
 		var contents = this.renderContents(scene);
 
 		return (
 			<div id={Scene.selector(scene)} className="scene">
-				<h3 className="scene-title">{scene.title} 
+				<h3 className="scene-title">{scene.title}
 					<a href={"#"+scene.label} name={scene.label}> # </a>
 				</h3>
                 <p>{contents}</p>
@@ -530,6 +556,7 @@ function ViewState(component, opts) {
 	this.showStorySettings = false;
 	this.chapterHist= new History(5, null);
 	this._urlfor = new UrlFor(opts.paths);
+	this.jumpToSource = opts.jumpToSource;
 
 	this.config = _.extend({
 		scrollToView: true,
@@ -569,7 +596,7 @@ ViewState.prototype = {
 		this.showStorySettings = yep;
 		return this.update();
 	},
-	
+
 	reconfigure: function(config) {
 		this.config = _.extend(this.config, config);
 	},

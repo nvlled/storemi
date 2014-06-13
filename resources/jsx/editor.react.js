@@ -42,10 +42,10 @@ var ImagePanel = root.ImagePanel = React.createClass({
 		options = _.map(options, function(opt, i) {
 			return (
 				<label>
-					<input type='radio' 
+					<input type='radio'
 						onClick={this.switchOption.bind(this, i)}
 						name='image-add-option' />
-					{opt}
+					<span>{opt}</span>
 				</label>
 			)
 		}.bind(this));
@@ -54,20 +54,20 @@ var ImagePanel = root.ImagePanel = React.createClass({
 		var images = this.state.data.images;
 		return (
 			<div>
-				<LabeledImages 
-					images={images} 
+				<LabeledImages
+					images={images}
 					removeImage={this.removeImage}/>
-				<form ref='select'>
+				<div ref='select'>
 					Select method:
 					{options}
-				</form>
+				</div>
 				<div>
 					{[
-						<ImageAddByUser 
+						<ImageAddByUser
 							listUserImages={this.props.listUserImages}
-							uploader={this.props.uploader} 
+							uploader={this.props.uploader}
 							addImage={this.addImage} />,
-						<ImageAddByURL 
+						<ImageAddByURL
 							addImage={this.addImage} />
 					][index]}
 				</div>
@@ -96,11 +96,13 @@ var LabeledImages = React.createClass({
 				<h4>Labeled Images</h4>
 				{renderIf(rows.length > 0)(
 				<table>
-					<tr>
-						<th>Preview</th>
-						<th>Label</th>
-						<th>Path</th>
-					</tr>
+					<thead>
+						<tr>
+							<th>Preview</th>
+							<th>Label</th>
+							<th>Path</th>
+						</tr>
+					</thead>
 					<tbody>{rows}</tbody>
 				</table>
 				,
@@ -157,7 +159,7 @@ var ImageUploader = React.createClass({
 		var status = this.state.status;
 		var completed = this.state.percentCompleted;
 
-		var text = status == "uploading" 
+		var text = status == "uploading"
 			? "Uploading... " + completed
 			: "Upload";
 		return (
@@ -165,9 +167,9 @@ var ImageUploader = React.createClass({
 				<h4>Upload image</h4>
 				<form ref='upload-form'>
 					<input name='image-data'type='file' />
-					<input 
+					<input
 						onClick={this.upload}
-						type='button' 
+						type='button'
 						value={text}/>
 					{renderIf(status == "failed")(
 						<span className="error">
@@ -232,12 +234,12 @@ var ImageAddByUser = React.createClass({
 						<input ref='label' size={4} />
 						<input ref='path'
 							onClick={this.addImage}
-							type='button' 
+							type='button'
 							value='Add image' />
 					</td>
 					,
 					<td>
-						<input name='image-browser' 
+						<input name='image-browser'
 							onClick={onClick}
 							type='radio' />
 					</td>
@@ -250,17 +252,19 @@ var ImageAddByUser = React.createClass({
 				<h4>Uploaded Images</h4>
 				{renderIf(rows.length > 0)(
 				<table>
-					<tr>
-						<th>Preview</th>
-						<th>Path</th>
-					</tr>
+					<thead>
+						<tr>
+							<th>Preview</th>
+							<th>Path</th>
+						</tr>
+					</thead>
 					<tbody>{rows}</tbody>
 				</table>
 				,
 				<p className='centered'><em>(no images)</em></p>
 				)}
 				<label>Label: </label>
-				<ImageUploader 
+				<ImageUploader
 					insertNewImage={this.insertNewImage}
 					uploader={this.props.uploader} />
 			</div>
@@ -285,7 +289,7 @@ var ImageAddByURL = React.createClass({
 				<p>Enter url:  <input ref='path'/></p>
 				<label>Label: </label>
 				<input ref='label' size={4} />
-				<input type='button' 
+				<input type='button'
 					onClick={this.addImage}
 					value='Add image' />
 			</div>

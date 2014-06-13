@@ -22,6 +22,7 @@ var Story = root.Story = React.createClass({displayName: 'Story',
 				configMode: this.props.configMode,
 				chapterId: data["chapter-id"],
 				sceneId: data["scene-id"],
+				jumpToSource: this.props.jumpToSource,
 			}),
 		}
 	},
@@ -58,20 +59,20 @@ var Story = root.Story = React.createClass({displayName: 'Story',
 	render: function() {
 		var story = this.state.data;
 		var view = this.state.view;
-		var chapter = 
+		var chapter =
 			view.getSelectedChapter(story.chapters);
 
 		var chapterComponent;
 		if (chapter) {
-			chapterComponent = 
-				Chapter( 
-					{key:chapter.label, 
+			chapterComponent =
+				Chapter(
+					{key:chapter.label,
 					story:story,
 					data:chapter,
 					view:view} );
 		} else {
 			var firstOne = _.first(story.chapters);
-			chapterComponent = 
+			chapterComponent =
 				ChapterLink( {chapter:firstOne, view:view}, 
 					"[read]"
 				)
@@ -95,18 +96,18 @@ var Story = root.Story = React.createClass({displayName: 'Story',
 		return (
 			React.DOM.div( {className:"story"}, 
 				React.DOM.h1( {className:"story-title"}, 
-					ChapterLink( {view:view, 
+					ChapterLink( {view:view,
 						href:view.urlfor('story'),
-						active:!chapter, 
+						active:!chapter,
 						chapter:{}}, 
 						story.storyTitle
 					),
 					renderIf(editURL)(
-					React.DOM.a( {className:"story-settings", 
+					React.DOM.a( {className:"story-settings",
 						href:editURL}, 
 						"[edit]"
 					)),
-					React.DOM.a( {className:"story-settings", 
+					React.DOM.a( {className:"story-settings",
 						onClick:showSettings,
 						href:"x"},  " [settings]"
 					)
@@ -122,13 +123,13 @@ var Story = root.Story = React.createClass({displayName: 'Story',
 						React.DOM.div(null, warnings)
 				),
 				React.DOM.div( {className:"chapter-history"}, 
-					React.DOM.a( {href:"#", 
+					React.DOM.a( {href:"#",
 						className:cl({invisible: !view.hasPrevious()}),
 						onClick:view.backChapter.bind(view)}, 
 						"[back]"
 					),
 					React.DOM.span(null ),
-					React.DOM.a( {href:"#", 
+					React.DOM.a( {href:"#",
 						style:{"float": "right"},
 						className:cl({invisible: !view.hasNext()}),
 						onClick:view.forwardChapter.bind(view)}, 
@@ -151,7 +152,7 @@ var StorySettings = React.createClass({displayName: 'StorySettings',
 	createHandler: function(optionName) {
 		return function() {
 			var node = this.refs[optionName].getDOMNode();
-			var config = { }; 
+			var config = { };
 			config[optionName] = node.checked;
 			this.props.view.reconfigure(config);
 		}.bind(this);
@@ -167,9 +168,9 @@ var StorySettings = React.createClass({displayName: 'StorySettings',
 				React.DOM.fieldset(null, 
 					React.DOM.legend(null, "Settings"),
 					React.DOM.label(null, 
-						React.DOM.input( {ref:"scrollToView", 
+						React.DOM.input( {ref:"scrollToView",
 							defaultChecked:config.scrollToView,
-							onClick:scrollToView, 
+							onClick:scrollToView,
 							type:"checkbox"} ),
 						"Scroll to view"
 					),
@@ -177,15 +178,15 @@ var StorySettings = React.createClass({displayName: 'StorySettings',
 					React.DOM.label(null, 
 						React.DOM.input( {ref:"rememberSubscenes",
 							defaultChecked:config.rememberSubscenes,
-							onClick:rememberSubscenes, 
+							onClick:rememberSubscenes,
 							type:"checkbox"} ),
 						"Remember subscenes"
 					),
 					React.DOM.br(null ),
-					React.DOM.input( 
+					React.DOM.input(
 						{onClick:view.displaySettings.bind(view, false),
-						name:"close", 
-						type:"button", 
+						name:"close",
+						type:"button",
 						value:"close"} )
 				)
 			)
@@ -216,15 +217,26 @@ var ChapterIndex = React.createClass({displayName: 'ChapterIndex',
 		var view = this.props.view;
 		var chapters = this.props.data;
 		var selChapter = view.getSelectedChapter(chapters);
+		var jumpToSource = view.jumpToSource;
 
 		var contents = _.map(chapters, function(chapter) {
 			var active = selChapter && selChapter.label == chapter.label;
 			return (
-				React.DOM.li(null, 
-					ChapterLink( 
-						{chapter:chapter, 
-						active:active, 
-						view:view} )
+				React.DOM.li( {key:chapter.label}, 
+					ChapterLink(
+						{chapter:chapter,
+						active:active,
+						view:view} ),
+					renderIf(jumpToSource) (
+						React.DOM.a( {onClick:function() {
+								jumpToSource(chapter.lineno)
+								return false;
+							},
+							className:"jump-source",
+							href:"#"}, 
+							"**"
+						)
+					)
 				)
 			);
 		});
@@ -241,20 +253,34 @@ var SceneIndex = React.createClass({displayName: 'SceneIndex',
 		var chapter = this.props.chapter;
 		var scenes = this.props.data;
 
+		var jumpToSource = view.jumpToSource;
 		var selScene = view.getSelectedScene(chapter);
 		var contents = _.map(scenes, function(scene) {
+
 			var handler = view.selectScene.bind(view, chapter, scene);
 			var className = cl({
 				active: selScene && selScene.label == scene.label
 			});
-			var href = 
+			var href =
 				view.urlfor('scene', chapter.label, scene.label);
 			return (
-				React.DOM.li(null, React.DOM.a( {href:href, 
+				React.DOM.li(null, 
+					React.DOM.a( {href:href,
 						onClick:handler,
 						className:className}, 
 						scene.title
-				))
+					),
+					renderIf(jumpToSource) (
+						React.DOM.a( {onClick:function() {
+								jumpToSource(scene.lineno)
+								return false;
+							},
+							className:"jump-source",
+							href:"#"}, 
+							"***"
+						)
+					)
+				)
 		)});
 
 		return (
@@ -283,8 +309,8 @@ var Chapter = React.createClass({displayName: 'Chapter',
 		scene || (scene = _.first(chapter.scenes));
 
 		var sceneComponent;
-		if (scene) sceneComponent = 
-				Scene( 
+		if (scene) sceneComponent =
+				Scene(
 					{key:scene.label,
 					story:this.props.story,
 					chapter:chapter,
@@ -305,10 +331,10 @@ var Chapter = React.createClass({displayName: 'Chapter',
 					React.DOM.div(null, warnings)
 				),
 				renderIf(!view.config.hideSceneIndex)(
-					SceneIndex( 
+					SceneIndex(
 						{chapter:chapter,
 						data:chapter.scenes,
-						view:view} ) 
+						view:view} )
 					),
 				React.DOM.br(null ),
 				sceneComponent
@@ -324,7 +350,7 @@ var SceneLink = React.createClass({displayName: 'SceneLink',
 		});
 		return (
 			React.DOM.a(  {href:this.props.href,
-				onClick:this.props.onClick, 
+				onClick:this.props.onClick,
 				className:classes}, 
 				this.props.children
 			)
@@ -344,9 +370,9 @@ var Scene = React.createClass({displayName: 'Scene',
 	subsceneHandler: function(subscene) {
 		var view = this.props.view;
 		return view.selectSubscene.bind(
-			this.props.view, 
-			this.props.chapter, 
-			this.props.data, 
+			this.props.view,
+			this.props.chapter,
+			this.props.data,
 			subscene
 		);
 	},
@@ -354,7 +380,7 @@ var Scene = React.createClass({displayName: 'Scene',
 	chapterHandler: function(toChapter) {
 		var view = this.props.view;
 		return view.selectChapter.bind(
-			this.props.view, 
+			this.props.view,
 			toChapter
 		);
 	},
@@ -362,14 +388,14 @@ var Scene = React.createClass({displayName: 'Scene',
     createSceneLink: function(elem, mappings, subscene) {
         var label = elem.label;
         var toScene = {label: mappings[label] || ""};
-		var active = subscene && 
+		var active = subscene &&
 			toScene.label == subscene.label ;
 		var chapter = this.props.chapter;
 		var view = this.props.view;
-		var href = 
+		var href =
 			view.urlfor('scene', chapter.label, toScene.label);
         return (
-			SceneLink( 
+			SceneLink(
 				{href:href,
 				toScene:toScene,
 				chapter:this.props.chapter,
@@ -383,7 +409,7 @@ var Scene = React.createClass({displayName: 'Scene',
     createChapterLink: function(elem, mappings) {
         var label = elem.label;
         var toChapter = {label: mappings[label] || "nope"};
-		var href = 
+		var href =
 			this.props.view.urlfor('chapter', toChapter.label);
         return (
             React.DOM.a( {className:"chapter-link",
@@ -407,7 +433,7 @@ var Scene = React.createClass({displayName: 'Scene',
         var key = elem.text;
 		var story = this.props.story;
 
-		var active = subscene && 
+		var active = subscene &&
 			toScene.label == subscene.label ;
 
 		var noVal = "XXXXX";
@@ -416,9 +442,9 @@ var Scene = React.createClass({displayName: 'Scene',
 
 		var handler = function() {
 			var input = this.refs.input.getDOMNode();
-			var value = input.value = 
+			var value = input.value =
 				(input.value || story.defaultBindings[key]) || noVal;
-			view.bindings.set(key, value); 
+			view.bindings.set(key, value);
 			input.blur();
 			this.subsceneHandler(toScene)();
 			return false;
@@ -431,15 +457,15 @@ var Scene = React.createClass({displayName: 'Scene',
 		}.bind(this);
 
 		var chapter = this.props.chapter;
-		var href = 
+		var href =
 			view.urlfor('scene', chapter.label, toScene.label);
         return (
             React.DOM.span( {className:"game-input"}, 
-                React.DOM.input( 
+                React.DOM.input(
                     {ref:"input",
                     defaultValue:value,
                     onKeyUp:onKeyUp} ),
-				SceneLink( {ref:"link", 
+				SceneLink( {ref:"link",
 					href:href,
 					toScene:toScene,
 					chapter:this.props.chapter,
@@ -499,19 +525,19 @@ var Scene = React.createClass({displayName: 'Scene',
 		var subscene = view.getSubscene(chapter, scene);
 
 		var subsceneComponent;
-		if (subscene) subsceneComponent = 
-				Scene( 
+		if (subscene) subsceneComponent =
+				Scene(
 					{key:scene.label,
 					story:this.props.story,
-					chapter:chapter, 
-					data:subscene, 
+					chapter:chapter,
+					data:subscene,
 					view:view} )
-		
+
 		var contents = this.renderContents(scene);
 
 		return (
 			React.DOM.div( {id:Scene.selector(scene), className:"scene"}, 
-				React.DOM.h3( {className:"scene-title"}, scene.title, 
+				React.DOM.h3( {className:"scene-title"}, scene.title,
 					React.DOM.a( {href:"#"+scene.label, name:scene.label},  " # " )
 				),
                 React.DOM.p(null, contents),
@@ -530,6 +556,7 @@ function ViewState(component, opts) {
 	this.showStorySettings = false;
 	this.chapterHist= new History(5, null);
 	this._urlfor = new UrlFor(opts.paths);
+	this.jumpToSource = opts.jumpToSource;
 
 	this.config = _.extend({
 		scrollToView: true,
@@ -569,7 +596,7 @@ ViewState.prototype = {
 		this.showStorySettings = yep;
 		return this.update();
 	},
-	
+
 	reconfigure: function(config) {
 		this.config = _.extend(this.config, config);
 	},

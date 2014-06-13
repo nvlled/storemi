@@ -100,4 +100,12 @@ td img {
 	text-align: center;
 }
 
+.jump-source {
+	text-decoration: none;
+	padding-left: 5px;
+	color: #666;
+}
 
+.jump-source:hover{
+	text-decoration: overline;
+}

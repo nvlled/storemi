@@ -42,10 +42,10 @@ var ImagePanel = root.ImagePanel = React.createClass({displayName: 'ImagePanel',
 		options = _.map(options, function(opt, i) {
 			return (
 				React.DOM.label(null, 
-					React.DOM.input( {type:"radio", 
+					React.DOM.input( {type:"radio",
 						onClick:this.switchOption.bind(this, i),
 						name:"image-add-option"} ),
-					opt
+					React.DOM.span(null, opt)
 				)
 			)
 		}.bind(this));
@@ -54,20 +54,20 @@ var ImagePanel = root.ImagePanel = React.createClass({displayName: 'ImagePanel',
 		var images = this.state.data.images;
 		return (
 			React.DOM.div(null, 
-				LabeledImages( 
-					{images:images, 
+				LabeledImages(
+					{images:images,
 					removeImage:this.removeImage}),
-				React.DOM.form( {ref:"select"}, 
+				React.DOM.div( {ref:"select"}, 
 					"Select method:",
 					options
 				),
 				React.DOM.div(null, 
 					[
-						ImageAddByUser( 
+						ImageAddByUser(
 							{listUserImages:this.props.listUserImages,
-							uploader:this.props.uploader, 
+							uploader:this.props.uploader,
 							addImage:this.addImage} ),
-						ImageAddByURL( 
+						ImageAddByURL(
 							{addImage:this.addImage} )
 					][index]
 				)
@@ -96,10 +96,12 @@ var LabeledImages = React.createClass({displayName: 'LabeledImages',
 				React.DOM.h4(null, "Labeled Images"),
 				renderIf(rows.length > 0)(
 				React.DOM.table(null, 
-					React.DOM.tr(null, 
-						React.DOM.th(null, "Preview"),
-						React.DOM.th(null, "Label"),
-						React.DOM.th(null, "Path")
+					React.DOM.thead(null, 
+						React.DOM.tr(null, 
+							React.DOM.th(null, "Preview"),
+							React.DOM.th(null, "Label"),
+							React.DOM.th(null, "Path")
+						)
 					),
 					React.DOM.tbody(null, rows)
 				)
@@ -157,7 +159,7 @@ var ImageUploader = React.createClass({displayName: 'ImageUploader',
 		var status = this.state.status;
 		var completed = this.state.percentCompleted;
 
-		var text = status == "uploading" 
+		var text = status == "uploading"
 			? "Uploading... " + completed
 			: "Upload";
 		return (
@@ -165,9 +167,9 @@ var ImageUploader = React.createClass({displayName: 'ImageUploader',
 				React.DOM.h4(null, "Upload image"),
 				React.DOM.form( {ref:"upload-form"}, 
 					React.DOM.input( {name:"image-data",type:"file"} ),
-					React.DOM.input( 
+					React.DOM.input(
 						{onClick:this.upload,
-						type:"button", 
+						type:"button",
 						value:text}),
 					renderIf(status == "failed")(
 						React.DOM.span( {className:"error"}, 
@@ -232,12 +234,12 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 						React.DOM.input( {ref:"label", size:4} ),
 						React.DOM.input( {ref:"path",
 							onClick:this.addImage,
-							type:"button", 
+							type:"button",
 							value:"Add image"} )
 					)
 					,
 					React.DOM.td(null, 
-						React.DOM.input( {name:"image-browser", 
+						React.DOM.input( {name:"image-browser",
 							onClick:onClick,
 							type:"radio"} )
 					)
@@ -250,9 +252,11 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 				React.DOM.h4(null, "Uploaded Images"),
 				renderIf(rows.length > 0)(
 				React.DOM.table(null, 
-					React.DOM.tr(null, 
-						React.DOM.th(null, "Preview"),
-						React.DOM.th(null, "Path")
+					React.DOM.thead(null, 
+						React.DOM.tr(null, 
+							React.DOM.th(null, "Preview"),
+							React.DOM.th(null, "Path")
+						)
 					),
 					React.DOM.tbody(null, rows)
 				)
@@ -260,7 +264,7 @@ var ImageAddByUser = React.createClass({displayName: 'ImageAddByUser',
 				React.DOM.p( {className:"centered"}, React.DOM.em(null, "(no images)"))
 				),
 				React.DOM.label(null, "Label: " ),
-				ImageUploader( 
+				ImageUploader(
 					{insertNewImage:this.insertNewImage,
 					uploader:this.props.uploader} )
 			)
@@ -285,7 +289,7 @@ var ImageAddByURL = React.createClass({displayName: 'ImageAddByURL',
 				React.DOM.p(null, "Enter url:  ",  React.DOM.input( {ref:"path"})),
 				React.DOM.label(null, "Label: " ),
 				React.DOM.input( {ref:"label", size:4} ),
-				React.DOM.input( {type:"button", 
+				React.DOM.input( {type:"button",
 					onClick:this.addImage,
 					value:"Add image"} )
 			)
